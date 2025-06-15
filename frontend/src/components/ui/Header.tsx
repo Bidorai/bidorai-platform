@@ -1,42 +1,25 @@
+// frontend/src/components/ui/Header.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Search, ShoppingCart, Phone, X } from 'lucide-react';
-import { SignIn, SignUp, useUser, UserButton } from '@clerk/nextjs';
-import { useSearchParams } from 'next/navigation';
-import SearchDropdown from './SearchDropdown';
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { useUser, UserButton } from '@clerk/nextjs';
+import { Search, ShoppingCart, Phone, Menu, X } from 'lucide-react';
 import Button from './Button';
+import { SearchDropdown } from './SearchDropdown';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  variant?: 'default' | 'minimal';
+}
+
+const Header: React.FC<HeaderProps> = ({ variant = 'default' }) => {
+  const { isSignedIn, user } = useUser();
   const [searchValue, setSearchValue] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
-  const [showSignIn, setShowSignIn] = useState(false);
-  const [showSignUp, setShowSignUp] = useState(false);
-  const { isSignedIn, user } = useUser();
-  const searchParams = useSearchParams();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Handle URL parameters for opening modals
-  useEffect(() => {
-    const auth = searchParams.get('auth');
-    if (auth === 'signin') {
-      setShowSignIn(true);
-      setShowSignUp(false);
-      // Clean up URL
-      window.history.replaceState({}, '', '/');
-    } else if (auth === 'signup') {
-      setShowSignUp(true);
-      setShowSignIn(false);
-      // Clean up URL
-      window.history.replaceState({}, '', '/');
-    }
-  }, [searchParams]);
-
-  const handleSearchFocus = () => {
-    setShowDropdown(true);
-  };
-
+  const handleSearchFocus = () => setShowDropdown(true);
   const handleSearchBlur = (e: React.FocusEvent) => {
-    // Delay hiding to allow clicks on dropdown items
     setTimeout(() => {
       if (!e.currentTarget.contains(e.relatedTarget as Node)) {
         setShowDropdown(false);
@@ -44,215 +27,180 @@ const Header: React.FC = () => {
     }, 200);
   };
 
-  const openSignIn = () => {
-    setShowSignIn(true);
-    setShowSignUp(false);
-  };
+  const navigation = [
+    { name: 'Browse', href: '/browse' },
+    { name: 'How it Works', href: '#how-it-works' },
+    { name: 'For Restaurants', href: '#restaurants' },
+  ];
 
-  const openSignUp = () => {
-    setShowSignUp(true);
-    setShowSignIn(false);
-  };
-
-  const closeModals = () => {
-    setShowSignIn(false);
-    setShowSignUp(false);
-  };
-
-  // Modal backdrop component
-  const ModalBackdrop = ({ children, onClose }: { children: React.ReactNode; onClose: () => void }) => (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      
-      {/* Modal Content */}
-      <div className="relative z-10 bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-20 p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-        >
-          <X className="w-5 h-5 text-gray-600" />
-        </button>
-        
-        {/* Modal Body */}
-        <div className="p-6 pt-12">
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-
-  return (
-    <>
-      <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="container mx-auto px-5">
-          <div className="flex items-center justify-between h-16 gap-5">
-            {/* Logo */}
-            <div className="flex items-center gap-2">
-              <div className="w-9 h-9 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg flex items-center justify-center text-white text-sm shadow-lg shadow-blue-600/30">
+  if (variant === 'minimal') {
+    return (
+      <header className="bg-white/90 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg flex items-center justify-center text-white text-sm">
                 🍽️
               </div>
-              <span className="text-2xl font-extrabold text-gray-800 tracking-tight">
-                Bidorai
-              </span>
-            </div>
-
-            {/* Search Bar */}
-            <div className="flex-1 max-w-md relative z-50">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 z-10" />
-                <input
-                  type="text"
-                  className="w-full pl-11 pr-3 py-3 border border-gray-300 rounded-lg text-base bg-gray-50 transition-all duration-200 focus:outline-none focus:border-blue-600 focus:bg-white focus:shadow-lg focus:shadow-blue-600/10"
-                  placeholder="Search BIDORAI"
-                  value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
-                  onFocus={handleSearchFocus}
-                  onBlur={handleSearchBlur}
-                />
-                
-                {showDropdown && (
-                  <SearchDropdown
-                    searchTerm={searchValue}
-                    onSelect={(term) => {
-                      setSearchValue(term);
-                      setShowDropdown(false);
-                    }}
-                  />
-                )}
-              </div>
-            </div>
-
-            {/* Navigation */}
-            <div className="flex items-center gap-5">
-              <div className="hidden md:flex items-center gap-1.5 text-gray-600 font-medium">
-                <Phone className="w-4 h-4" />
-                <span>1-800-BIDORAI</span>
-              </div>
-              
-              <span className="hidden lg:block text-gray-600 font-medium">
-                For Restaurant Owners
-              </span>
-              
-              <div className="relative">
-                <ShoppingCart className="w-6 h-6 text-gray-600" />
-                <div className="absolute -top-2 -right-2 bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-lg shadow-blue-600/30">
-                  2
-                </div>
-              </div>
-              
-              {/* Authentication Buttons */}
-              {isSignedIn ? (
-                <div className="flex items-center gap-3">
-                  <span className="hidden sm:block text-gray-700 font-medium">
-                    Welcome, {user?.firstName || 'User'}!
-                  </span>
-                  <UserButton 
-                    afterSignOutUrl="/"
-                    appearance={{
-                      elements: {
-                        avatarBox: "w-10 h-10",
-                        userButtonPopoverCard: "shadow-2xl border border-gray-200",
-                        userButtonPopoverActionButton: "hover:bg-blue-50"
-                      }
-                    }}
-                  />
-                </div>
-              ) : (
-                <>
-                  <Button variant="ghost" onClick={openSignIn}>
-                    Sign In
-                  </Button>
-                  <Button variant="primary" onClick={openSignUp}>
-                    Sign Up
-                  </Button>
-                </>
-              )}
-            </div>
+              <span className="text-xl font-bold text-gray-900">BIDORAI</span>
+            </Link>
+            
+            {isSignedIn && (
+              <UserButton afterSignOutUrl="/" />
+            )}
           </div>
         </div>
       </header>
+    );
+  }
 
-      {/* Sign In Modal */}
-      {showSignIn && (
-        <ModalBackdrop onClose={closeModals}>
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Welcome Back!</h2>
-            <p className="text-gray-600">Sign in to your Bidorai account</p>
-          </div>
-          
-          <SignIn 
-            appearance={{
-              elements: {
-                formButtonPrimary: "bg-blue-600 hover:bg-blue-700 text-white",
-                card: "shadow-none border-0",
-                headerTitle: "hidden",
-                headerSubtitle: "hidden",
-                socialButtonsBlockButton: "border-gray-200 hover:bg-gray-50",
-                formFieldInput: "border-gray-300 focus:border-blue-600 focus:ring-blue-600",
-                footerActionLink: "text-blue-600 hover:text-blue-700"
-              }
-            }}
-            redirectUrl="/"
-            signUpUrl="#"
-          />
-          
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
-              Don't have an account?{' '}
-              <button 
-                onClick={openSignUp}
-                className="text-blue-600 hover:text-blue-700 font-semibold"
-              >
-                Sign up here
-              </button>
-            </p>
-          </div>
-        </ModalBackdrop>
-      )}
+  return (
+    <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3 flex-shrink-0">
+            <div className="w-9 h-9 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg flex items-center justify-center text-white shadow-lg">
+              🍽️
+            </div>
+            <span className="text-2xl font-bold text-gray-900 tracking-tight">
+              BIDORAI
+            </span>
+          </Link>
 
-      {/* Sign Up Modal */}
-      {showSignUp && (
-        <ModalBackdrop onClose={closeModals}>
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Join Bidorai!</h2>
-            <p className="text-gray-600">Create your account and start bidding</p>
-          </div>
-          
-          <SignUp 
-            appearance={{
-              elements: {
-                formButtonPrimary: "bg-blue-600 hover:bg-blue-700 text-white",
-                card: "shadow-none border-0",
-                headerTitle: "hidden", 
-                headerSubtitle: "hidden",
-                socialButtonsBlockButton: "border-gray-200 hover:bg-gray-50",
-                formFieldInput: "border-gray-300 focus:border-blue-600 focus:ring-blue-600",
-                footerActionLink: "text-blue-600 hover:text-blue-700"
-              }
-            }}
-            redirectUrl="/"
-            signInUrl="#"
-          />
-          
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
-              Already have an account?{' '}
-              <button 
-                onClick={openSignIn}
-                className="text-blue-600 hover:text-blue-700 font-semibold"
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
               >
-                Sign in here
-              </button>
-            </p>
+                {item.name}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Search Bar */}
+          <div className="flex-1 max-w-lg mx-8 relative">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                className="w-full pl-11 pr-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:bg-white focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all duration-200"
+                placeholder="Search restaurants, cuisines..."
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                onFocus={handleSearchFocus}
+                onBlur={handleSearchBlur}
+              />
+              
+              {showDropdown && (
+                <SearchDropdown
+                  searchTerm={searchValue}
+                  onSelect={(term) => {
+                    setSearchValue(term);
+                    setShowDropdown(false);
+                  }}
+                />
+              )}
+            </div>
           </div>
-        </ModalBackdrop>
-      )}
-    </>
+
+          {/* Right Side Actions */}
+          <div className="flex items-center gap-4">
+            {/* Contact Info */}
+            <div className="hidden lg:flex items-center gap-2 text-gray-600">
+              <Phone className="w-4 h-4" />
+              <span className="font-medium">1-800-BIDORAI</span>
+            </div>
+
+            {/* Cart */}
+            <Link href="/cart" className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <ShoppingCart className="w-6 h-6 text-gray-700" />
+              <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                2
+              </span>
+            </Link>
+
+            {/* Authentication */}
+            {isSignedIn ? (
+              <div className="flex items-center gap-3">
+                <Link href="/bidding">
+                  <Button variant="ghost" size="sm">
+                    Dashboard
+                  </Button>
+                </Link>
+                <UserButton 
+                  afterSignOutUrl="/"
+                  appearance={{
+                    elements: {
+                      userButtonAvatarBox: "w-10 h-10",
+                    }
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="hidden sm:flex items-center gap-3">
+                <Link href="/sign-in">
+                  <Button variant="ghost">Sign In</Button>
+                </Link>
+                <Link href="/sign-up">
+                  <Button variant="primary">Join Free</Button>
+                </Link>
+              </div>
+            )}
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              {mobileMenuOpen ? (
+                <X className="w-6 h-6 text-gray-700" />
+              ) : (
+                <Menu className="w-6 h-6 text-gray-700" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-gray-200 py-4">
+            <div className="space-y-4">
+              {/* Navigation Links */}
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="block px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {item.name}
+                </Link>
+              ))}
+              
+              {/* Authentication for Mobile */}
+              {!isSignedIn && (
+                <div className="border-t border-gray-200 pt-4 px-4 space-y-3">
+                  <Link href="/sign-in" className="block">
+                    <Button variant="ghost" className="w-full justify-center">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link href="/sign-up" className="block">
+                    <Button variant="primary" className="w-full justify-center">
+                      Join Free
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </header>
   );
 };
 

@@ -1,227 +1,278 @@
+// frontend/src/components/ui/BiddingPanel.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Info } from 'lucide-react';
+import { Info, Clock, Users, DollarSign, Zap, AlertTriangle } from 'lucide-react';
+import { useAuth } from '@clerk/nextjs';
+import { Auction } from '@/types/bidding';
+import { useBidding } from '@/hooks/useBidding';
+import { formatTimeRemaining, formatCurrency, calculateSavings } from '@/lib/utils';
 import Button from './Button';
+import { toast } from 'sonner';
+import Link from 'next/link';
 
-interface Restaurant {
-  id: string;
-  name: string;
-  rating: number;
-  distance: number;
-  cuisine: string;
-  dish: string;
-  serves: number;
-  bidders: number;
-  price: number;
-  progress: number;
-  tag: string;
-  bgColor: string;
-  iconBg: string;
+interface BiddingPanelProps {
+  variant?: 'full' | 'compact';
 }
 
-const BiddingPanel: React.FC = () => {
-  const [timeRemaining, setTimeRemaining] = useState('2:45');
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([
-    {
-      id: 'farm-fresh',
-      name: 'Farm Fresh Kitchen',
-      rating: 4.9,
-      distance: 0.8,
-      cuisine: 'Organic Certified',
-      dish: '🥗 Organic Harvest Bowl',
-      serves: 15,
-      bidders: 8,
-      price: 217,
-      progress: 75,
-      tag: '🌱 Fresh picked today!',
-      bgColor: 'bg-blue-50 border-blue-200',
-      iconBg: 'bg-gradient-to-r from-blue-600 to-blue-700'
-    },
-    {
-      id: 'green-garden',
-      name: 'Green Garden Bistro',
-      rating: 4.8,
-      distance: 1.2,
-      cuisine: 'Farm-to-Table',
-      dish: '🥘 Sustainable Feast Tray',
-      serves: 12,
-      bidders: 12,
-      price: 185,
-      progress: 0,
-      tag: '',
-      bgColor: 'bg-gray-50 border-gray-200',
-      iconBg: 'bg-gradient-to-r from-gray-800 to-gray-900'
-    },
-    {
-      id: 'tokyo-sushi',
-      name: 'Tokyo Sushi',
-      rating: 4.7,
-      distance: 2.1,
-      cuisine: 'Japanese Fresh',
-      dish: '🍣 Sushi Platter',
-      serves: 8,
-      bidders: 6,
-      price: 165,
-      progress: 45,
-      tag: '🆕 New entry!',
-      bgColor: 'bg-blue-50 border-blue-200',
-      iconBg: 'bg-gradient-to-r from-blue-600 to-blue-700'
-    },
-    {
-      id: 'el-mariachi',
-      name: 'El Mariachi',
-      rating: 4.6,
-      distance: 1.8,
-      cuisine: 'Mexican Authentic',
-      dish: '🌮 Taco Bar Setup',
-      serves: 20,
-      bidders: 15,
-      price: 245,
-      progress: 92,
-      tag: '🚀 Bidding war!',
-      bgColor: 'bg-gray-50 border-gray-200',
-      iconBg: 'bg-gradient-to-r from-gray-800 to-gray-900'
-    },
-    {
-      id: 'pasta-palace',
-      name: 'Pasta Palace',
-      rating: 4.5,
-      distance: 3.4,
-      cuisine: 'Italian Classic',
-      dish: '🍝 Pasta Buffet Tray',
-      serves: 18,
-      bidders: 4,
-      price: 195,
-      progress: 30,
-      tag: '⏰ Ending soon!',
-      bgColor: 'bg-blue-50 border-blue-200',
-      iconBg: 'bg-gradient-to-r from-blue-600 to-blue-700'
+const BiddingPanel: React.FC<BiddingPanelProps> = ({ variant = 'compact' }) => {
+  const { isSignedIn } = useAuth();
+  const { auctions, isLoading, error, placeBid } = useBidding();
+  const [selectedAuction, setSelectedAuction] = useState<Auction | null>(null);
+  const [bidAmount, setBidAmount] = useState<string>('');
+  const [showBidForm, setShowBidForm] = useState(false);
+
+  // Calculate total potential savings
+  const totalSavings = auctions.reduce((total, auction) => {
+    const savings = calculateSavings(auction.startPrice, auction.currentBid);
+    return total + savings.amount;
+  }, 0);
+
+  const handlePlaceBid = async () => {
+    if (!selectedAuction || !bidAmount) return;
+
+    const amount = parseInt(bidAmount);
+    if (isNaN(amount) || amount < selectedAuction.minimumBid) {
+      toast.error(`Minimum bid is ${formatCurrency(selectedAuction.minimumBid)}`);
+      return;
     }
-  ]);
 
-  // Update countdown timer
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeRemaining(prev => {
-        const [minutes, seconds] = prev.split(':').map(Number);
-        let totalSeconds = minutes * 60 + seconds - 1;
-        
-        if (totalSeconds <= 0) {
-          totalSeconds = 180; // Reset to 3 minutes
-        }
-        
-        const newMinutes = Math.floor(totalSeconds / 60);
-        const newSeconds = totalSeconds % 60;
-        
-        return `${newMinutes}:${newSeconds.toString().padStart(2, '0')}`;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  // Update bid prices periodically
-  useEffect(() => {
-    const bidTimer = setInterval(() => {
-      setRestaurants(prev => prev.map(restaurant => ({
-        ...restaurant,
-        price: restaurant.price + Math.floor(Math.random() * 15) + 1
-      })));
-    }, 5000);
-
-    return () => clearInterval(bidTimer);
-  }, []);
-
-  const handlePlaceBid = () => {
-    alert('Bid placement functionality would go here!');
+    try {
+      await placeBid(selectedAuction.id, amount);
+      setShowBidForm(false);
+      setBidAmount('');
+      setSelectedAuction(null);
+    } catch (error) {
+      // Error handling is done in the hook
+    }
   };
 
-  const RestaurantCard: React.FC<{ restaurant: Restaurant }> = ({ restaurant }) => (
-    <div className={`${restaurant.bgColor} border rounded-lg p-3 mb-3`}>
-      <div className="flex justify-between items-start mb-2">
-        <div className="flex gap-3 flex-1">
-          <div className={`w-11 h-11 rounded-lg flex items-center justify-center text-white font-extrabold text-lg shadow-lg ${restaurant.iconBg}`}>
-            {restaurant.name[0]}
+  const openBidForm = (auction: Auction) => {
+    if (!isSignedIn) {
+      toast.error('Please sign in to place bids');
+      return;
+    }
+    setSelectedAuction(auction);
+    setBidAmount(auction.minimumBid.toString());
+    setShowBidForm(true);
+  };
+
+  const RestaurantCard: React.FC<{ auction: Auction }> = ({ auction }) => {
+    const timeRemaining = formatTimeRemaining(auction.endTime);
+    const isEndingSoon = new Date(auction.endTime).getTime() - Date.now() < 30 * 60 * 1000; // 30 minutes
+    
+    return (
+      <div className={`${auction.id.includes('farm') ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'} border rounded-lg p-3 mb-3 hover:shadow-md transition-shadow`}>
+        <div className="flex justify-between items-start mb-2">
+          <div className="flex gap-3 flex-1">
+            <div className={`w-11 h-11 rounded-lg flex items-center justify-center text-white font-extrabold text-lg shadow-lg ${
+              auction.id.includes('farm') ? 'bg-gradient-to-r from-blue-600 to-blue-700' : 'bg-gradient-to-r from-gray-700 to-gray-800'
+            }`}>
+              {auction.restaurant?.name[0] || auction.title[0]}
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-gray-800 mb-1">{auction.restaurant?.name || auction.title}</h3>
+              <div className="text-sm text-gray-600 mb-1">
+                <span className="text-blue-600 font-semibold">⭐ {auction.restaurant?.rating || 4.8}</span>
+                <span> • </span>
+                <span>{auction.restaurant?.location?.city || 'Dallas'}</span>
+                <span> • </span>
+                <span className="font-semibold">{auction.cuisine}</span>
+              </div>
+              <div className="text-sm text-gray-600">{auction.dish} • Serves {auction.serves}</div>
+              <div className="flex items-center gap-1.5 text-xs text-gray-600 mt-1">
+                <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></div>
+                <span>👥 {auction.totalBidders} people bidding</span>
+              </div>
+            </div>
           </div>
-          <div className="flex-1">
-            <h3 className="font-bold text-gray-800 mb-1">{restaurant.name}</h3>
-            <div className="text-sm text-gray-600 mb-1">
-              <span className="text-blue-600 font-semibold">⭐ {restaurant.rating}</span>
-              <span> • </span>
-              <span>{restaurant.distance} km</span>
-              <span> • </span>
-              <span className="font-semibold">{restaurant.cuisine}</span>
-            </div>
-            <div className="text-sm text-gray-600">{restaurant.dish} • Serves {restaurant.serves}</div>
-            <div className="flex items-center gap-1.5 text-xs text-gray-600 mt-1">
-              <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></div>
-              <span>👥 {restaurant.bidders} people bidding</span>
-            </div>
+          <div className="text-right">
+            <div className="text-2xl font-bold text-blue-600">{formatCurrency(auction.currentBid)}</div>
+            <div className="text-xs text-gray-500">Min: {formatCurrency(auction.minimumBid)}</div>
           </div>
         </div>
-        <div className="text-2xl font-bold text-blue-600">${restaurant.price}</div>
-      </div>
-      
-      {restaurant.progress > 0 && (
+        
+        {/* Progress Bar */}
         <div className="w-full h-1 bg-gray-200 rounded-full my-2 overflow-hidden">
           <div 
             className="h-full bg-gradient-to-r from-blue-600 to-blue-700 rounded-full transition-all duration-500"
-            style={{ width: `${restaurant.progress}%` }}
+            style={{ width: `${Math.min((auction.currentBid / auction.startPrice) * 100, 100)}%` }}
           ></div>
         </div>
-      )}
-      
-      {restaurant.tag && (
-        <div className="flex justify-center">
-          <div className="bg-blue-600 text-white px-3 py-1.5 rounded-full text-sm flex items-center gap-1">
-            <span>{restaurant.tag}</span>
+        
+        {/* Time and Status */}
+        <div className="flex items-center justify-between text-sm mb-2">
+          <div className={`flex items-center gap-1 ${isEndingSoon ? 'text-red-600' : 'text-gray-600'}`}>
+            <Clock className="w-4 h-4" />
+            <span>{timeRemaining}</span>
+            {isEndingSoon && <AlertTriangle className="w-4 h-4" />}
+          </div>
+          <div className="text-green-600 font-medium">
+            Save {formatCurrency(auction.startPrice - auction.currentBid)}
+          </div>
+        </div>
+
+        {/* Action Button */}
+        <Button
+          variant="primary"
+          size="sm"
+          className="w-full"
+          onClick={() => openBidForm(auction)}
+        >
+          <Zap className="w-4 h-4 mr-1" />
+          Bid {formatCurrency(auction.minimumBid)}
+        </Button>
+      </div>
+    );
+  };
+
+  const BidForm = () => {
+    if (!selectedAuction) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl p-6 max-w-md w-full">
+          <h3 className="text-xl font-bold mb-4">Place Your Bid</h3>
+          <div className="mb-4">
+            <h4 className="font-semibold">{selectedAuction.title}</h4>
+            <p className="text-gray-600 text-sm">{selectedAuction.restaurant?.name}</p>
+          </div>
+          
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">Bid Amount</label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+              <input
+                type="number"
+                min={selectedAuction.minimumBid}
+                step={selectedAuction.bidIncrement}
+                value={bidAmount}
+                onChange={(e) => setBidAmount(e.target.value)}
+                className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+                placeholder={selectedAuction.minimumBid.toString()}
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Minimum bid: {formatCurrency(selectedAuction.minimumBid)}
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            <Button
+              variant="ghost"
+              className="flex-1"
+              onClick={() => {
+                setShowBidForm(false);
+                setSelectedAuction(null);
+                setBidAmount('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              className="flex-1"
+              onClick={handlePlaceBid}
+              isLoading={isLoading}
+            >
+              Place Bid
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="bg-white rounded-2xl shadow-xl p-6 min-h-[600px] flex flex-col">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-bold text-gray-900">Live Bidding</h2>
+          <Info className="w-5 h-5 text-gray-400 cursor-help" title="Real-time food auctions" />
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+          <span className="text-sm font-medium text-green-600">LIVE</span>
+        </div>
+      </div>
+
+      {/* Stats Bar */}
+      {auctions.length > 0 && (
+        <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-4 mb-6 border border-blue-100">
+          <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1 text-blue-600">
+                <Clock className="w-4 h-4" />
+                <span className="font-medium">{auctions.length} Live</span>
+              </div>
+              <div className="flex items-center gap-1 text-green-600">
+                <DollarSign className="w-4 h-4" />
+                <span className="font-medium">Save {formatCurrency(totalSavings)}</span>
+              </div>
+            </div>
+            
+            <div className="text-gray-600 font-medium">
+              🎯 Avg 18% savings
+            </div>
           </div>
         </div>
       )}
-    </div>
-  );
 
-  return (
-    <div className="bg-white rounded-2xl shadow-xl p-6 min-h-[550px] flex flex-col">
-      {/* Header */}
-      <div className="flex justify-center items-center mb-4 relative">
-        <div className="flex items-center gap-1">
-          <span className="text-xl font-extrabold text-gray-800">Party Menu Bidding</span>
-          <Info className="w-5 h-5 text-gray-400" />
+      {/* Error Display */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+          <p className="text-red-700 text-sm">{error}</p>
         </div>
-        <span className="absolute right-0 bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-medium">
-          LIVE
-        </span>
+      )}
+
+      {/* Auctions List */}
+      <div className="flex-1 overflow-y-auto space-y-4 mb-6">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        ) : auctions.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">🍽️</div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Live Auctions</h3>
+            <p className="text-gray-600 mb-4">Check back soon for delicious deals!</p>
+            <Link href="/browse">
+              <Button variant="primary" size="sm">
+                Browse Restaurants
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          auctions.map(auction => (
+            <RestaurantCard key={auction.id} auction={auction} />
+          ))
+        )}
       </div>
 
-      {/* Countdown Timer */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 rounded-lg text-center font-bold mb-4 text-sm shadow-lg shadow-blue-600/30">
-        ⏰ <span>{timeRemaining}</span> remaining
-      </div>
-
-      {/* Savings Display */}
-      <div className="bg-gradient-to-r from-gray-800 to-gray-900 text-white px-4 py-4 rounded-xl text-center mb-5 shadow-lg shadow-gray-800/30">
-        <div className="text-2xl font-extrabold mb-1">Save $284</div>
-        <div className="text-sm opacity-90">🎯 Average 18% below market price</div>
-      </div>
-
-      {/* Restaurant List */}
-      <div className="flex-1 max-h-96 overflow-y-auto mb-2 scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-gray-100">
-        {restaurants.map((restaurant) => (
-          <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-        ))}
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex flex-col gap-2">
-        <Button variant="cta" size="md" onClick={handlePlaceBid} className="w-full">
-          🎯 Place Your Bid Now
+      {/* Quick Actions */}
+      <div className="space-y-3">
+        <Button
+          variant="primary"
+          size="lg"
+          className="w-full"
+          onClick={() => auctions.length > 0 && openBidForm(auctions[0])}
+          disabled={auctions.length === 0}
+        >
+          <Zap className="w-5 h-5 mr-2" />
+          Quick Bid on Best Deal
         </Button>
-        <Button variant="navy-outline" size="md" className="w-full">
-          ▶️ Watch Demo
-        </Button>
+        
+        <Link href="/browse">
+          <Button variant="ghost" size="md" className="w-full">
+            🔍 Browse All Restaurants
+          </Button>
+        </Link>
       </div>
+
+      {/* Bid Form Modal */}
+      {showBidForm && <BidForm />}
     </div>
   );
 };

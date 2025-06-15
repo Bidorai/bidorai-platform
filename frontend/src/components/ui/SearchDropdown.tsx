@@ -1,3 +1,4 @@
+// frontend/src/components/ui/SearchDropdown.tsx
 'use client';
 
 import React from 'react';
@@ -7,7 +8,7 @@ interface SearchDropdownProps {
   onSelect: (term: string) => void;
 }
 
-const SearchDropdown: React.FC<SearchDropdownProps> = ({ searchTerm, onSelect }) => {
+export const SearchDropdown: React.FC<SearchDropdownProps> = ({ searchTerm, onSelect }) => {
   const popularSearches = [
     { icon: '🍕', title: 'Pizza', subtitle: 'Most ordered this week', tag: 'Trending' },
     { icon: '🍣', title: 'Sushi', subtitle: 'Fresh daily selections', tag: '' },
@@ -23,7 +24,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({ searchTerm, onSelect })
   const restaurants = [
     { icon: '🏪', title: 'Farm Fresh Kitchen', subtitle: '⭐ 4.9 • Organic • 0.8 km' },
     { icon: '🏪', title: 'Green Garden Bistro', subtitle: '⭐ 4.7 • Farm-to-Table • 3.2 km' },
-    { icon: '🏪', title: 'Artisan Eatery', subtitle: '⭐ 4.8 • Local Sourced • 1.5 km' }
+    { icon: '🏪', title: 'Tokyo Sushi Bar', subtitle: '⭐ 4.8 • Japanese • 1.5 km' }
   ];
 
   const filterItems = (items: any[], searchTerm: string) => {
@@ -111,5 +112,3 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({ searchTerm, onSelect })
     </div>
   );
 };
-
-export default SearchDropdown;
