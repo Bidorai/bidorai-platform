@@ -1,7 +1,7 @@
 // frontend/src/app/bidding/page.tsx
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import Header from "@/components/ui/Header";
+import Header from "@/components/home/Header";
 import BiddingPanel from "@/components/ui/BiddingPanel";
 
 export default function BiddingPage() {
