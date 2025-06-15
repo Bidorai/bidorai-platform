@@ -124,9 +124,10 @@ const HeroSection: React.FC = () => {
 
       {/* Search Form */}
       <div className="flex flex-col gap-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Location Input */}
-          <div className="relative">
+        {/* Updated grid layout: Location gets 2/3 width, Party Size gets 1/3 width */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Location Input - Takes 2 columns */}
+          <div className="relative md:col-span-2">
             <input
               type="text"
               value={location}
@@ -156,8 +157,8 @@ const HeroSection: React.FC = () => {
             )}
           </div>
 
-          {/* Party Size Input */}
-          <div className="relative">
+          {/* Party Size Input - Takes 1 column */}
+          <div className="relative md:col-span-1">
             <input
               type="number"
               min="10"
@@ -166,7 +167,7 @@ const HeroSection: React.FC = () => {
               value={partySize}
               onChange={(e) => handlePartySizeChange(parseInt(e.target.value) || 10)}
               className="w-full px-4 py-3.5 border-2 border-gray-300 rounded-lg text-base bg-white transition-all duration-200 min-h-12 focus:outline-none focus:border-blue-600"
-              placeholder="Party size (10-1000)"
+              placeholder="Party size"
             />
             
             {showHelper && (

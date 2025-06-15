@@ -1,5 +1,5 @@
 import React from 'react';
-import Header from '@/components/ui/Header';
+import HeaderWrapper from '@/components/ui/HeaderWrapper';
 import HeroSection from '@/components/ui/HeroSection';
 import BiddingPanel from '@/components/ui/BiddingPanel';
 import ThreeWaysSection from '@/components/ui/ThreeWaysSection';
@@ -15,7 +15,7 @@ import {
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <HeaderWrapper />
       
       <main className="py-10 min-h-[calc(100vh-64px)]">
         <div className="container mx-auto px-5">
