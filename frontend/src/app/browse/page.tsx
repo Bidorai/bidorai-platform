@@ -141,16 +141,6 @@ export default function BrowseRestaurants() {
               </div>
               
               <select
-                value={selectedCuisine}
-                onChange={(e) => setSelectedCuisine(e.target.value)}
-                className="px-4 py-3 bg-white border border-bidorai-neutral-300 rounded-xl text-bidorai-neutral-900 focus:outline-none focus:ring-2 focus:ring-bidorai-blue-500 shadow-sm"
-              >
-                {cuisines.map(cuisine => (
-                  <option key={cuisine} value={cuisine}>{cuisine}</option>
-                ))}
-              </select>
-              
-              <select
                 value={priceRange}
                 onChange={(e) => setPriceRange(e.target.value)}
                 className="px-4 py-3 bg-white border border-bidorai-neutral-300 rounded-xl text-bidorai-neutral-900 focus:outline-none focus:ring-2 focus:ring-bidorai-blue-500 shadow-sm"

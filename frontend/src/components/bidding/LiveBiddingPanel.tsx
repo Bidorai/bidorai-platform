@@ -173,7 +173,7 @@ export function LiveBiddingPanel() {
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-2">
-          <span className="text-xl font-extrabold text-bidorai-navy-900">Live Party Menu Bidding</span>
+          <span className="text-xl font-extrabold text-bidorai-navy-900">Party Menu Bidding</span>
           <span className="text-lg">ℹ️</span>
         </div>
         <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-medium animate-pulse-glow">

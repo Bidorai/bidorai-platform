@@ -14,7 +14,6 @@ interface LocationData {
 export function HeroSection() {
   const [location, setLocation] = useState<string>('Detecting location...')
   const [partySize, setPartySize] = useState<number>(15)
-  const [cuisine, setCuisine] = useState<string>('')
   const [isDetectingLocation, setIsDetectingLocation] = useState<boolean>(false)
 
   useEffect(() => {
@@ -104,22 +103,6 @@ export function HeroSection() {
     console.log('🔍 Searching:', { location, partySize, cuisine })
   }
 
-  const cuisineOptions = [
-    { value: '', label: '🍽️ Cuisine (optional)' },
-    { value: 'american', label: '🇺🇸 American' },
-    { value: 'italian', label: '🇮🇹 Italian' },
-    { value: 'chinese', label: '🥡 Chinese' },
-    { value: 'mexican', label: '🌮 Mexican' },
-    { value: 'indian', label: '🍛 Indian' },
-    { value: 'japanese', label: '🍣 Japanese' },
-    { value: 'thai', label: '🍜 Thai' },
-    { value: 'mediterranean', label: '🫒 Mediterranean' },
-    { value: 'bbq', label: '🍖 BBQ & Grill' },
-    { value: 'vegetarian', label: '🥗 Vegetarian' },
-    { value: 'vegan', label: '🌱 Vegan' },
-    { value: 'farm-to-table', label: '🚜 Farm-to-Table' },
-  ]
-
   return (
     <div className="bg-white rounded-2xl shadow-lift p-8 lg:p-10 flex flex-col justify-center animate-slide-up-fade">
       {/* Tagline */}
@@ -139,7 +122,7 @@ export function HeroSection() {
       {/* Subtitle */}
       <p className="text-lg lg:text-xl text-bidorai-neutral-600 text-center mb-7 font-medium max-w-lg mx-auto leading-relaxed">
         Bid on delicious half & full tray meals from local restaurants. 
-        <span className="text-bidorai-blue-600 font-semibold"> Name your price</span> 
+        <span className="text-bidorai-blue-600 font-semibold"> Name your price </span> 
         and pick it up fresh.
       </p>
 
@@ -178,17 +161,6 @@ export function HeroSection() {
             />
           </div>
         </div>
-        <select
-          className="w-full px-4 py-4 border-2 border-bidorai-neutral-200 rounded-lg text-base bg-white transition-colors focus:outline-none focus:border-bidorai-blue-600 min-h-[48px]"
-          value={cuisine}
-          onChange={(e) => handleCuisineSelection(e.target.value)}
-        >
-          {cuisineOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
         <button
           onClick={searchPartyMenu}
           className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg py-4 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] min-h-[48px]"

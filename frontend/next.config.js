@@ -3,10 +3,8 @@ const nextConfig = {
   images: {
     domains: ['via.placeholder.com', 'images.unsplash.com'],
   },
-  experimental: {
-    // Disable Service Worker registration in development mode
-    serviceWorker: process.env.NODE_ENV === 'production',
-  },
+  // Removed the invalid serviceWorker configuration
+  // Next.js doesn't have an experimental.serviceWorker option
 }
 
 module.exports = nextConfig
