@@ -2,7 +2,7 @@
 'use client'
 
 import { useUser } from '@clerk/nextjs'
-import { Header } from '@/components/home/Header'
+import Header from '@/components/home/Header'
 import { Footer } from '@/components/home/Footer'
 import { 
   Trophy, 

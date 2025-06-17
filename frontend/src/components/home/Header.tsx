@@ -5,10 +5,15 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Search, ShoppingCart } from 'lucide-react'
 import { toast } from 'sonner'
-import { useUser } from '@clerk/nextjs'
+import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
+import { signOutUser } from '@/app/actions/auth';
+import { UserButton } from '@clerk/nextjs';
 
-export function Header() {
+export default function Header() {
   const { user } = useUser()
+  const [showDropdown, setShowDropdown] = useState(false)
+  const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
 
   const handleSearch = (e: React.FormEvent) => {
@@ -63,24 +68,24 @@ export function Header() {
             >
               For Restaurants
             </Link>
-            <div className="relative cursor-pointer" onClick={showCart}>
-              <ShoppingCart className="w-6 h-6 text-bidorai-neutral-600 hover:text-bidorai-blue-600 transition-colors" />
-              <div className="absolute -top-2 -right-2 bg-orange-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-md">
+            <button 
+              onClick={showCart}
+              className="relative group flex items-center justify-center w-10 h-10 rounded-lg hover:bg-bidorai-neutral-100 transition-colors"
+            >
+              <ShoppingCart className="w-5 h-5 text-bidorai-neutral-600 group-hover:text-bidorai-blue-600 transition-colors" />
+              <span className="absolute -top-1 -right-1 bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-md">
                 2
-              </div>
-            </div>
+              </span>
+            </button>
             
             {user ? (
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-bidorai-neutral-600">
-                  Hi, {user.firstName || 'User'}
-                </span>
-                <Link 
-                  href="/dashboard"
-                  className="bg-bidorai-blue-600 hover:bg-bidorai-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg"
-                >
-                  Dashboard
-                </Link>
+              <div className="relative">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-bidorai-neutral-600">
+                    Hi, {user.firstName || 'User'}
+                  </span>
+                  <UserButton afterSignOutUrl="/sign-in" />
+                </div>
               </div>
             ) : (
               <div className="flex items-center gap-3">

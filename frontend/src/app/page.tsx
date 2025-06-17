@@ -2,7 +2,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Header } from '@/components/home/Header'
+import Header from '@/components/home/Header'
 import { HeroSection } from '@/components/home/HeroSection'
 import { LiveBiddingPanel } from '@/components/bidding/LiveBiddingPanel'
 import { ThreeWaysSection } from '@/components/home/ThreeWaysSection'
