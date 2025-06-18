@@ -1,12 +1,12 @@
-// frontend/src/components/browse/BrowsePageHeader.tsx
+// frontend/src/components/Browse/BrowsePageHeader.tsx
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 import Link from 'next/link'
-import { Search, ShoppingCart, MapPin, Users, ChevronDown } from 'lucide-react'
+import { Users, Search } from 'lucide-react'
 import { toast } from 'sonner'
-import { useUser, UserButton } from '@clerk/nextjs'
+import { LocationAutocomplete } from '@/components/common/LocationAutocomplete'
+import { useLocation } from '@/contexts/LocationContext'
 
 interface BrowsePageHeaderProps {
   onLocationChange?: (location: string) => void
@@ -14,91 +14,14 @@ interface BrowsePageHeaderProps {
   onSearch?: (query: string) => void
 }
 
-export default function BrowsePageHeader({ 
-  onLocationChange, 
-  onPartySizeChange, 
-  onSearch 
+export default function BrowsePageHeader({
+  onLocationChange,
+  onPartySizeChange,
+  onSearch
 }: BrowsePageHeaderProps) {
-  const { user } = useUser()
-  const searchParams = useSearchParams()
-  
-  // Initialize state with URL parameters or defaults
-  const [location, setLocation] = useState('Dallas, TX')
+  const { location } = useLocation()
   const [partySize, setPartySize] = useState(15)
   const [searchQuery, setSearchQuery] = useState('')
-  const [isDetectingLocation, setIsDetectingLocation] = useState(false)
-
-  useEffect(() => {
-    // Read initial values from URL parameters
-    const urlLocation = searchParams.get('location')
-    const urlPartySize = searchParams.get('partySize')
-    const urlCuisine = searchParams.get('cuisine')
-    
-    if (urlLocation) {
-      setLocation(urlLocation)
-      onLocationChange?.(urlLocation)
-      console.log('📍 Location loaded from URL:', urlLocation)
-    }
-    
-    if (urlPartySize) {
-      const parsedSize = parseInt(urlPartySize)
-      if (parsedSize >= 10 && parsedSize <= 1000) {
-        setPartySize(parsedSize)
-        onPartySizeChange?.(parsedSize)
-        console.log('👥 Party size loaded from URL:', parsedSize)
-      }
-    }
-    
-    if (urlCuisine) {
-      console.log('🍽️ Cuisine filter loaded from URL:', urlCuisine)
-    }
-
-    // Show welcome message if parameters were passed
-    if (urlLocation || urlPartySize) {
-      setTimeout(() => {
-        toast.success(`Welcome! Searching in ${urlLocation || location} for ${urlPartySize || partySize} people`)
-      }, 500)
-    }
-  }, [searchParams, onLocationChange, onPartySizeChange])
-
-  const requestLocation = () => {
-    if (!navigator.geolocation) {
-      toast.error('Geolocation is not supported by this browser')
-      return
-    }
-
-    setIsDetectingLocation(true)
-    setLocation('📍 Getting your location...')
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords
-        let city = 'Dallas, TX'
-
-        if (latitude >= 32.78 && latitude <= 32.88 && longitude >= -97.0 && longitude <= -96.9) {
-          city = 'Irving, TX'
-        } else if (latitude >= 32.7 && latitude <= 32.8 && longitude >= -97.0 && longitude <= -96.7) {
-          city = 'Dallas, TX'
-        } else if (latitude >= 33.0 && longitude <= -96.8) {
-          city = 'Plano, TX'
-        }
-        
-        setLocation(city)
-        setIsDetectingLocation(false)
-        onLocationChange?.(city)
-        
-        toast.success('✅ Location updated successfully')
-      },
-      (error) => {
-        console.log('📍 Location error:', error.message)
-        setLocation('Dallas, TX')
-        setIsDetectingLocation(false)
-        onLocationChange?.('Dallas, TX')
-        toast.error('Could not detect location, using Dallas, TX')
-      },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 }
-    )
-  }
 
   const validatePartySize = (value: string) => {
     let numValue = parseInt(value) || 15
@@ -127,6 +50,11 @@ export default function BrowsePageHeader({
     }
   }
 
+  const handleLocationSelect = (address: string, coordinates: { lat: number; lng: number }) => {
+    onLocationChange?.(address)
+    console.log('Location updated in header:', address, coordinates)
+  }
+
   const showCart = () => {
     toast.info('Opening shopping cart...')
     console.log('🛒 Cart clicked')
@@ -149,24 +77,12 @@ export default function BrowsePageHeader({
 
           {/* Search Controls */}
           <div className="flex items-center gap-3 flex-1 max-w-4xl mx-4">
-            {/* Location Field */}
+            {/* Location Field - Now using LocationAutocomplete */}
             <div className="relative min-w-[200px]">
-              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-bidorai-neutral-400 w-4 h-4" />
-              <input
-                type="text"
-                className="w-full pl-10 pr-20 py-2 border border-bidorai-neutral-300 rounded-md text-sm bg-white transition-colors focus:outline-none focus:border-bidorai-blue-600"
-                value={location}
-                readOnly
+              <LocationAutocomplete
                 placeholder="Enter pickup location..."
+                onLocationSelect={handleLocationSelect}
               />
-              <button
-                type="button"
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 bg-bidorai-blue-600 text-white border-none rounded px-2 py-1 text-xs cursor-pointer font-semibold whitespace-nowrap disabled:opacity-50 hover:bg-bidorai-blue-700 transition-colors"
-                onClick={requestLocation}
-                disabled={isDetectingLocation}
-              >
-                {isDetectingLocation ? '📍 Getting...' : '📍 Detect'}
-              </button>
             </div>
 
             {/* Party Size Field */}
@@ -213,52 +129,53 @@ export default function BrowsePageHeader({
                 1-800-BIDORAI
               </a>
             </span>
-            
-            <Link 
-              href="/restaurants" 
-              className="hidden md:block text-bidorai-neutral-600 font-medium hover:text-bidorai-blue-600 transition-colors text-sm"
-            >
-              For Restaurants
-            </Link>
-            
-            <button 
+
+            {/* Account Links */}
+            <div className="flex items-center gap-3 text-sm">
+              <Link 
+                href="/sign-in" 
+                className="text-bidorai-neutral-600 hover:text-bidorai-blue-600 transition-colors font-medium"
+              >
+                Sign In
+              </Link>
+              <Link 
+                href="/sign-up" 
+                className="bg-bidorai-blue-600 hover:bg-bidorai-blue-700 text-white px-4 py-2 rounded-md transition-colors font-medium"
+              >
+                Sign Up
+              </Link>
+            </div>
+
+            {/* Cart */}
+            <button
               onClick={showCart}
-              className="relative group flex items-center justify-center w-9 h-9 rounded-lg hover:bg-bidorai-neutral-100 transition-colors"
+              className="relative p-2 text-bidorai-neutral-600 hover:text-bidorai-blue-600 transition-colors"
             >
-              <ShoppingCart className="w-4 h-4 text-bidorai-neutral-600 group-hover:text-bidorai-blue-600 transition-colors" />
-              <span className="absolute -top-1 -right-1 bg-orange-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-md">
-                2
+              <span className="text-xl">🛒</span>
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                0
               </span>
             </button>
-            
-            {user ? (
-              <div className="flex items-center gap-2">
-                <span className="hidden sm:block text-sm text-bidorai-neutral-600">
-                  Hi, {user.firstName || 'User'}
-                </span>
-                <UserButton afterSignOutUrl="/sign-in" />
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link 
-                  href="/sign-in"
-                  className="text-bidorai-neutral-600 hover:text-bidorai-blue-600 font-medium transition-colors text-sm"
-                >
-                  Sign In
-                </Link>
-                <Link 
-                  href="/sign-up"
-                  className="bg-bidorai-blue-600 hover:bg-bidorai-blue-700 text-white px-3 py-2 rounded-md font-semibold transition-all duration-200 shadow-sm hover:shadow-md text-sm"
-                >
-                  Sign Up
-                </Link>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
-
+      {/* Location Info Bar */}
+      {location.address && (
+        <div className="bg-bidorai-blue-50 border-t border-bidorai-blue-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="py-2 flex items-center justify-between text-sm">
+              <div className="flex items-center gap-2 text-bidorai-blue-700">
+                <span>📍</span>
+                <span>Delivering to: <strong>{location.address}</strong></span>
+              </div>
+              <div className="text-bidorai-blue-600">
+                Party size: <strong>{partySize} people</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   )
 }
