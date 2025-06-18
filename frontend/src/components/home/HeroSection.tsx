@@ -1,34 +1,44 @@
-// src/components/home/HeroSection.tsx
+// frontend/src/components/home/HeroSection.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { MapPin, Users } from 'lucide-react'
 import { toast } from 'sonner'
 
-interface LocationData {
-  city: string
-  state: string
-  formatted: string
-}
-
 export function HeroSection() {
-  const [location, setLocation] = useState<string>('Detecting location...')
-  const [partySize, setPartySize] = useState<number>(15)
-  const [isDetectingLocation, setIsDetectingLocation] = useState<boolean>(false)
+  const router = useRouter()
+  const [location, setLocation] = useState('Detecting your location...')
+  const [partySize, setPartySize] = useState(15)
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false)
+  const [cuisine, setCuisine] = useState('')
+
+  const cuisineOptions = [
+    { value: '', label: 'All Cuisines' },
+    { value: 'italian', label: 'Italian' },
+    { value: 'chinese', label: 'Chinese' },
+    { value: 'mexican', label: 'Mexican' },
+    { value: 'bbq', label: 'BBQ' },
+    { value: 'mediterranean', label: 'Mediterranean' },
+    { value: 'indian', label: 'Indian' },
+    { value: 'thai', label: 'Thai' }
+  ]
 
   useEffect(() => {
+    // Initialize location on component mount
     requestLocation()
   }, [])
 
-  const requestLocation = async () => {
-    setIsDetectingLocation(true)
-    
+  const requestLocation = () => {
     if (!navigator.geolocation) {
       setLocation('Dallas, TX')
       setIsDetectingLocation(false)
       updateForLocation('Dallas, TX')
       return
     }
+
+    setIsDetectingLocation(true)
+    setLocation('📍 Getting your location...')
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -40,6 +50,8 @@ export function HeroSection() {
         if (latitude >= 32.78 && latitude <= 32.88 && longitude >= -97.0 && longitude <= -96.9) {
           city = 'Irving, TX'
           toast.success('🏠 Irving special offers detected!')
+        } else if (latitude >= 32.7 && latitude <= 32.8 && longitude >= -97.0 && longitude <= -96.7) {
+          city = 'Dallas, TX'
         } else if (latitude >= 33.0 && longitude <= -96.8) {
           city = 'Plano, TX'
         }
@@ -64,7 +76,6 @@ export function HeroSection() {
 
   const updateForLocation = (locationStr: string) => {
     console.log('🏙️ Updating for location:', locationStr)
-    // Additional location-specific updates can go here
   }
 
   const validatePartySize = (value: string) => {
@@ -93,14 +104,32 @@ export function HeroSection() {
     }
   }
 
+  // Updated function to navigate with parameters
   const searchPartyMenu = () => {
-    toast.info('Searching for perfect party menus...')
+    // Validate required fields
+    if (!location || location.includes('Detecting') || location.includes('Getting')) {
+      toast.error('Please set your pickup location first')
+      return
+    }
+
+    if (partySize < 10) {
+      toast.error('Party size must be at least 10 people')
+      return
+    }
+
+    toast.success('Searching for perfect party menus...')
     
+    // Build URL with search parameters
+    const searchParams = new URLSearchParams({
+      location: location,
+      partySize: partySize.toString(),
+      ...(cuisine && { cuisine: cuisine })
+    })
+
+    // Navigate to browse page with parameters
     setTimeout(() => {
-      toast.success(`Found 12 restaurants in ${location} for ${partySize} people!`)
-    }, 1500)
-    
-    console.log('🔍 Searching:', { location, partySize, cuisine })
+      router.push(`/browse?${searchParams.toString()}`)
+    }, 500)
   }
 
   return (
@@ -121,7 +150,7 @@ export function HeroSection() {
       
       {/* Subtitle */}
       <p className="text-lg lg:text-xl text-bidorai-neutral-600 text-center mb-7 font-medium max-w-lg mx-auto leading-relaxed">
-        Bid on delicious half & full tray meals from local restaurants. 
+        Bid on delicious half & full tray meals from local restaurants.{' '}
         <span className="text-bidorai-blue-600 font-semibold"> Name your price </span> 
         and pick it up fresh.
       </p>
@@ -136,7 +165,7 @@ export function HeroSection() {
               className="w-full pl-12 pr-28 py-4 border-2 border-bidorai-neutral-200 rounded-lg text-base bg-white transition-colors focus:outline-none focus:border-bidorai-blue-600 min-h-[48px]"
               value={location}
               readOnly
-              placeholder="Detecting location..."
+              placeholder="Pickup location..."
             />
             <button
               type="button"

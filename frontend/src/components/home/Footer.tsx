@@ -1,3 +1,4 @@
+// frontend/src/components/home/Footer.tsx
 'use client'
 
 import Link from 'next/link'
@@ -42,7 +43,7 @@ export function Footer() {
       
       <div className="max-w-6xl mx-auto px-5 relative z-10">
         {/* Header */}
-        <div className="text-center mb-15 pb-15 border-b border-white/10">
+        <div className="text-center mb-15 pb-17 border-b border-white/10">
           <div className="flex items-center justify-center gap-3 mb-5">
             <div className="w-12 h-12 bg-gradient-to-r from-bidorai-blue-600 to-bidorai-blue-700 rounded-xl flex items-center justify-center text-2xl shadow-lg shadow-bidorai-blue-600/30">
               🍽️
