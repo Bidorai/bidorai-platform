@@ -101,7 +101,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         },
       }}
     >
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <head>
           {/* Preconnect to Google Maps */}
           <link rel="preconnect" href="https://maps.googleapis.com" />
@@ -121,6 +121,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           {/* Viewport settings for better mobile experience */}
           <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         </head>
+        <body className={inter.className} suppressHydrationWarning></body>
         <body className={`${inter.className} antialiased`}>
           {/* Location Context Provider - provides location state to all components */}
           <LocationProvider>

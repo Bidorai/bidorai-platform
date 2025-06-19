@@ -1,21 +1,78 @@
-// src/app/page.tsx - CORRECTED to match original design structure
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import Header from '@/components/home/Header'
 import { HeroSection } from '@/components/home/HeroSection'
-import { LiveBiddingPanel } from '@/components/bidding/LiveBiddingPanel'
-import { ThreeWaysSection } from '@/components/home/ThreeWaysSection'
-import { RestaurantShowcase } from '@/components/home/RestaurantShowcase'
-import { WhyChooseSection } from '@/components/home/WhyChooseSection'
-import { FeaturesSection } from '@/components/home/FeaturesSection'
-import { TestimonialsSection } from '@/components/home/TestimonialsSection'
-import { CallToActionSection } from '@/components/home/CallToActionSection'
-import { Footer } from '@/components/home/Footer'
+import ClientOnly from '@/components/common/ClientOnly'
+
+// Dynamically import components that might cause hydration issues
+const LiveBiddingPanel = dynamic(
+  () => import('@/components/bidding/LiveBiddingPanel').then(mod => ({ default: mod.LiveBiddingPanel })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full">
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-xl font-bold text-gray-900">Party Menu Bidding</span>
+          <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+            LIVE
+          </span>
+        </div>
+        <div className="text-center text-gray-500 py-8">
+          Loading live auctions...
+        </div>
+      </div>
+    )
+  }
+)
+
+const ThreeWaysSection = dynamic(
+  () => import('@/components/home/ThreeWaysSection').then(mod => ({ default: mod.ThreeWaysSection })),
+  { ssr: true }
+)
+
+const RestaurantShowcase = dynamic(
+  () => import('@/components/home/RestaurantShowcase').then(mod => ({ default: mod.RestaurantShowcase })),
+  { ssr: true }
+)
+
+const WhyChooseSection = dynamic(
+  () => import('@/components/home/WhyChooseSection').then(mod => ({ default: mod.WhyChooseSection })),
+  { ssr: true }
+)
+
+const FeaturesSection = dynamic(
+  () => import('@/components/home/FeaturesSection').then(mod => ({ default: mod.FeaturesSection })),
+  { ssr: true }
+)
+
+const TestimonialsSection = dynamic(
+  () => import('@/components/home/TestimonialsSection').then(mod => ({ default: mod.TestimonialsSection })),
+  { ssr: true }
+)
+
+const CallToActionSection = dynamic(
+  () => import('@/components/home/CallToActionSection').then(mod => ({ default: mod.CallToActionSection })),
+  { ssr: true }
+)
+
+const Footer = dynamic(
+  () => import('@/components/home/Footer').then(mod => ({ default: mod.Footer })),
+  { ssr: true }
+)
 
 export default function HomePage() {
-  // Add scroll animations
+  const [isClient, setIsClient] = useState(false)
+
   useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  // Client-side only scroll animations
+  useEffect(() => {
+    if (!isClient || typeof window === 'undefined') return
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -24,15 +81,18 @@ export default function HomePage() {
       })
     }, { threshold: 0.1 })
     
-    document.querySelectorAll('.fade-in-up').forEach(el => {
-      observer.observe(el)
-    })
+    // Only observe elements after client hydration
+    setTimeout(() => {
+      document.querySelectorAll('.fade-in-up').forEach(el => {
+        observer.observe(el)
+      })
+    }, 100)
 
     return () => observer.disconnect()
-  }, [])
+  }, [isClient])
 
   return (
-    <div className="min-h-screen bg-bidorai-neutral-50">
+    <div className="min-h-screen bg-gray-50">
       <Header />
       
       <main>
@@ -41,7 +101,40 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 min-h-[600px] items-stretch">
               <HeroSection />
-              <LiveBiddingPanel />
+              <ClientOnly
+                fallback={
+                  <div className="bg-white rounded-2xl shadow-lg p-6 flex flex-col h-full">
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="text-xl font-bold text-gray-900">Party Menu Bidding</span>
+                      <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                        LIVE
+                      </span>
+                    </div>
+                    <div className="bg-blue-600 text-white p-3 rounded-lg text-center font-bold mb-4 text-sm">
+                      Loading...
+                    </div>
+                    <div className="bg-gray-800 text-white p-4 rounded-xl text-center mb-5">
+                      <div className="text-2xl font-bold mb-1">Save $284</div>
+                      <div className="text-sm opacity-90">🎯 Average 18% below market price</div>
+                    </div>
+                    <div className="flex-1 mb-4">
+                      <div className="text-center text-gray-500 py-8">
+                        Loading live auctions...
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <button
+                        disabled
+                        className="w-full bg-gray-300 text-gray-500 font-semibold py-3 px-4 rounded-lg min-h-[48px] text-base"
+                      >
+                        🎯 Loading...
+                      </button>
+                    </div>
+                  </div>
+                }
+              >
+                <LiveBiddingPanel />
+              </ClientOnly>
             </div>
           </div>
         </section>

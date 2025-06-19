@@ -1,5 +1,6 @@
-// frontend/src/middleware.ts
+// src/middleware.ts - Correct for Clerk v5.7.5
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
 
 const isProtectedRoute = createRouteMatcher([
   '/bidding(.*)',
@@ -9,28 +10,21 @@ const isProtectedRoute = createRouteMatcher([
   '/orders(.*)',
 ])
 
-const isPublicRoute = createRouteMatcher([
-  '/',
-  '/browse(.*)',
-  '/sign-in(.*)',
-  '/sign-up(.*)',
-  '/how-it-works',
-  '/restaurants',
-  '/about',
-  '/contact',
-  '/api/webhooks(.*)',
-])
-
-export default clerkMiddleware(async (auth, req) => {
-  // Always allow access to public routes
-  if (isPublicRoute(req)) {
-    return
+export default clerkMiddleware((auth, req) => {
+  // For protected routes, check authentication
+  if (isProtectedRoute(req)) {
+    const { userId } = auth()
+    
+    if (!userId) {
+      // Redirect to sign-in page
+      const signInUrl = new URL('/sign-in', req.url)
+      signInUrl.searchParams.set('redirect_url', req.url)
+      return NextResponse.redirect(signInUrl)
+    }
   }
   
-  // Protect routes that require authentication
-  if (isProtectedRoute(req)) {
-    await auth.protect()
-  }
+  // Allow the request to continue
+  return NextResponse.next()
 })
 
 export const config = {
