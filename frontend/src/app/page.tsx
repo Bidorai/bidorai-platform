@@ -63,15 +63,12 @@ const Footer = dynamic(
 )
 
 export default function HomePage() {
-  const [isClient, setIsClient] = useState(false)
-
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
+  // Initialize isClient as true since this is a client component
+  const [isClient, setIsClient] = useState(true)
 
   // Client-side only scroll animations
   useEffect(() => {
-    if (!isClient || typeof window === 'undefined') return
+    if (typeof window === 'undefined') return
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -81,15 +78,13 @@ export default function HomePage() {
       })
     }, { threshold: 0.1 })
     
-    // Only observe elements after client hydration
-    setTimeout(() => {
-      document.querySelectorAll('.fade-in-up').forEach(el => {
-        observer.observe(el)
-      })
-    }, 100)
+    // Observe elements immediately after hydration
+    document.querySelectorAll('.fade-in-up').forEach(el => {
+      observer.observe(el)
+    })
 
     return () => observer.disconnect()
-  }, [isClient])
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-50">

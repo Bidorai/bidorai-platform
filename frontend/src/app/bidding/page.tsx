@@ -2,7 +2,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Header from "@/components/home/Header";
-import BiddingPanel from "@/components/ui/BiddingPanel";
+import { LiveBiddingPanel } from "@/components/bidding/LiveBiddingPanel";
 
 export default function BiddingPage() {
   const { userId } = auth();
@@ -52,7 +52,7 @@ export default function BiddingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Bidding Panel */}
             <div className="lg:col-span-2">
-              <BiddingPanel variant="full" />
+              <LiveBiddingPanel />
             </div>
 
             {/* Sidebar */}
