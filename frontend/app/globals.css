@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --foreground-rgb: 0, 0, 0;
+    --background-rgb: 255, 255, 255;
+  }
+
+  .dark {
+    --foreground-rgb: 255, 255, 255;
+    --background-rgb: 0, 0, 0;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-colors;
+  }
+}
+
+@layer utilities {
+  .border-border {
+    border-color: theme('colors.border.DEFAULT');
+  }
+  .bg-background {
+    background-color: rgb(var(--background-rgb));
+  }
+  .text-foreground {
+    color: rgb(var(--foreground-rgb));
+  }
+}
