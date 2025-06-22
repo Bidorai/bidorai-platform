@@ -9,28 +9,20 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@radix-ui/react-toast": "^1.2.14",
-    "@tanstack/react-query": "^5.81.0",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "lucide-react": "^0.518.0",
     "next": "14.2.15",
-    "next-auth": "^4.24.11",
-    "next-themes": "^0.4.6",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "react-hot-toast": "^2.5.2",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.7.2"
   },
   "devDependencies": {
-    "@types/node": "^20.19.1",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "autoprefixer": "^10.4.17",
-    "eslint": "^8.56.0",
+    "@types/node": "20.14.10",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "autoprefixer": "10.4.19",
+    "eslint": "8.57.0",
     "eslint-config-next": "14.2.15",
-    "postcss": "^8.4.35",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5.3.3"
+    "postcss": "8.4.38",
+    "tailwindcss": "3.4.1",
+    "typescript": "5.5.3"
   }
 }

@@ -1,7 +1,6 @@
-// app/components/BiddingPanel.tsx
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Restaurant } from '../types';
 
 interface BiddingPanelProps {
@@ -10,30 +9,17 @@ interface BiddingPanelProps {
 
 export default function BiddingPanel({ restaurants }: BiddingPanelProps) {
   const [timeRemaining, setTimeRemaining] = useState(238);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    // Clear any existing interval
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-
-    // Set up new interval
-    intervalRef.current = setInterval(() => {
-      setTimeRemaining((prev) => {
+    const timer = setInterval(() => {
+      setTimeRemaining(prev => {
         if (prev <= 0) return 180;
         return prev - 1;
       });
     }, 1000);
 
-    // Cleanup function
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, []); // Empty dependency array - only run once
+    return () => clearInterval(timer);
+  }, []);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);

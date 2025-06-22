@@ -1,22 +1,23 @@
+// app/layout.tsx
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
-  title: "BIDORAI - Party Tray Food Bidding App",
+  title: "Bidorai - Party Tray Food Bidding App",
   description: "Bid your Meal. Win your Order. Feast your Party.",
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} min-h-screen`}>
+      <body className="antialiased">
         {children}
       </body>
     </html>

@@ -1,4 +1,3 @@
-// app/components/HomeContent.tsx
 'use client';
 
 import { useState } from 'react';
@@ -8,9 +7,9 @@ import BiddingPanel from './BiddingPanel';
 import { ThreeWaysSection, WhyChooseSection, FeaturesSection, TestimonialsSection, CTASection } from './Sections';
 import CulinarySection from './CulinarySection';
 import Footer from './Footer';
-import { Restaurant } from './types';
+import { Restaurant } from '../types';
 
-export function HomeContent() {
+export default function HomeContent() {
   const [location, setLocation] = useState<string>('Dallas, TX');
   const [restaurants] = useState<Restaurant[]>([
     {
@@ -61,7 +60,7 @@ export function HomeContent() {
       <main className="bg-gray-50">
         {/* Hero and Bidding Section */}
         <div className="container mx-auto px-4 py-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
             <HeroSection location={location} setLocation={setLocation} />
             <BiddingPanel restaurants={restaurants} />
           </div>

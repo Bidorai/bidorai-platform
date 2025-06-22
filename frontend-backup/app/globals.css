@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom button styles */
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-semibold transition-all duration-200 transform hover:-translate-y-0.5;
+  }
+  
+  .btn-primary {
+    @apply bg-[#1877F2] text-white hover:bg-[#1565C0] shadow-md hover:shadow-lg;
+  }
+  
+  .btn-ghost {
+    @apply text-gray-700 hover:bg-gray-100;
+  }
+}
+
+/* Custom animations */
+@keyframes pulse {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 rgba(24, 119, 242, 0.7);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 0 10px rgba(24, 119, 242, 0);
+    transform: scale(1.05);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1877F2;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #1565C0;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1877F2 #f1f5f9;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}

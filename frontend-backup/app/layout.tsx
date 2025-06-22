@@ -1,4 +1,4 @@
-// frontend/src/app/layout.tsx
+// app/layout.tsx
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
@@ -6,8 +6,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'BIDORAI - Smart Food Bidding Platform',
-  description: 'Bid on premium catering from top local restaurants.',
+  title: 'BIDORAI - Party Tray Food Bidding App',
+  description: 'Bid your Meal. Win your Order. Feast your Party.',
 }
 
 export default function RootLayout({
@@ -17,9 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className} suppressHydrationWarning>
-        {children}
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   )
 }
