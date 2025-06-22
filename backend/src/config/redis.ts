@@ -3,12 +3,19 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const client = createClient({
-  url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
+const redisClient = createClient({
+  socket: {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT || '6379'),
+  }
 });
 
-client.on('error', (error) => {
-  console.error('Redis Error:', error);
+redisClient.on('error', (err) => {
+  console.error('Redis Client Error', err);
 });
 
-export default client;
+redisClient.on('ready', () => {
+  console.log('Redis Client Ready');
+});
+
+export default redisClient;

@@ -1,3 +1,5 @@
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Image optimization configuration
@@ -6,6 +8,15 @@ const nextConfig = {
       'maps.googleapis.com',
     ],
     formats: ['image/webp', 'image/avif'],
+  },
+
+  // Path aliases configuration
+  webpack: (config, { isServer }) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.join(__dirname),
+    };
+    return config;
   },
 
   // Environment variables

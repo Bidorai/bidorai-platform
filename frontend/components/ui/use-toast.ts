@@ -6,12 +6,13 @@ import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const ToastProvider = ToastPrimitive.Provider
+const ToastViewport = ToastPrimitive.Viewport
 
-const ToastViewport = React.forwardRef<
-  React.ElementRef<typeof ToastPrimitive.Viewport>,
-  React.ComponentPropsWithoutRef<typeof ToastPrimitive.Viewport>
+const ToastViewportWrapper = React.forwardRef<
+  React.ElementRef<typeof ToastViewport>,
+  React.ComponentPropsWithoutRef<typeof ToastViewport>
 >(({ className, ...props }, ref) => (
-  <ToastPrimitive.Viewport
+  <ToastViewport
     ref={ref}
     className={cn(
       "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
@@ -118,7 +119,7 @@ export {
   type ToastProps,
   type ToastActionElement,
   ToastProvider,
-  ToastViewport,
+  ToastViewportWrapper as ToastViewport,
   Toast,
   ToastTitle,
   ToastDescription,

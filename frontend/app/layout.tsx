@@ -1,12 +1,12 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import '@/app/globals.css';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'BIDORAI - Party Tray Food Bidding App',
-  description: 'Bid on delicious half & full tray meals from local restaurants. Name your price and pick it up fresh.',
+  title: "BIDORAI - Party Tray Food Bidding App",
+  description: "Bid your Meal. Win your Order. Feast your Party.",
 };
 
 export default function RootLayout({
@@ -16,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} min-h-screen`}>
         {children}
       </body>
     </html>

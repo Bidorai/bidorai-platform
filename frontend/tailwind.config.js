@@ -1,8 +1,9 @@
-// frontend/tailwind.config.js
 module.exports = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
@@ -12,6 +13,10 @@ module.exports = {
       colors: {
         border: {
           DEFAULT: 'hsl(var(--border))',
+        },
+        facebook: {
+          DEFAULT: '#1877F2',
+          hover: '#1565C0',
         },
       },
     },

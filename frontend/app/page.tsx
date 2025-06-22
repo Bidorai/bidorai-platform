@@ -1,12 +1,11 @@
 'use client';
 
-import Providers from '@/components/Providers';
-import HomePageContent from './components/HomePageContent';
+import { HomeContent } from '../components/HomeContent';
 
-export default function HomePage() {
+export default function Home() {
   return (
-    <Providers>
-      <HomePageContent />
-    </Providers>
+    <div className="min-h-screen bg-gray-50">
+      <HomeContent />
+    </div>
   );
 }
