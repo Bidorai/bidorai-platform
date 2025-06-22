@@ -2,12 +2,12 @@
 'use client';
 
 import { useState } from 'react';
-import Header from './Header';
-import HeroSection from './HeroSection';
+import Header from './layout/Header';
+import HeroSection from './home/HeroSection';
 import BiddingPanel from './BiddingPanel';
-import { ThreeWaysSection, WhyChooseSection, FeaturesSection, TestimonialsSection, CTASection } from './Sections';
-import CulinarySection from './CulinarySection';
-import Footer from './Footer';
+import { ThreeWaysSection, WhyChooseSection, FeaturesSection, TestimonialsSection, CTASection } from './home/Sections';
+import CulinarySection from './home/CulinarySection';
+import Footer from './layout/Footer';
 import { Restaurant } from '../types';
 
 export default function HomeClient() {
