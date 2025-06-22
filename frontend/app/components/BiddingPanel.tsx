@@ -1,65 +1,20 @@
+// app/components/BiddingPanel.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
-import io, { Socket } from 'socket.io-client';
-
-interface Restaurant {
-  id: string;
-  name: string;
-  rating: number;
-  distance: number;
-  cuisine: string;
-  dish: string;
-  serves: number;
-  bidders: number;
-  currentBid: number;
-  progress: number;
-  tag: string;
-}
+import { Restaurant } from './types';
 
 interface BiddingPanelProps {
   restaurants: Restaurant[];
 }
 
 export default function BiddingPanel({ restaurants }: BiddingPanelProps) {
-  const [timeRemaining, setTimeRemaining] = useState(165); // 2:45
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [liveRestaurants, setLiveRestaurants] = useState<Restaurant[]>(restaurants);
+  const [timeRemaining, setTimeRemaining] = useState(238); // 2:38
 
   useEffect(() => {
-    // Initialize Socket.IO connection
-    const newSocket = io('http://localhost:5000');
-    setSocket(newSocket);
-
-    newSocket.on('connect', () => {
-      console.log('Connected to bidding server');
-      newSocket.emit('join-bidding', {});
-    });
-
-    newSocket.on('bid-update', (data) => {
-      setLiveRestaurants(prev => 
-        prev.map(r => 
-          r.id === data.restaurantId 
-            ? { ...r, currentBid: data.newPrice, bidders: data.bidderCount }
-            : r
-        )
-      );
-    });
-
-    return () => {
-      newSocket.close();
-    };
-  }, []);
-
-  useEffect(() => {
-    setLiveRestaurants(restaurants);
-  }, [restaurants]);
-
-  useEffect(() => {
-    // Countdown timer
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
-        if (prev <= 0) return 180; // Reset to 3:00
+        if (prev <= 0) return 180;
         return prev - 1;
       });
     }, 1000);
@@ -73,92 +28,71 @@ export default function BiddingPanel({ restaurants }: BiddingPanelProps) {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const placeBid = () => {
-    alert('Bid placement functionality coming soon!');
-  };
-
-  const getBackgroundStyle = (index: number) => {
-    return index % 2 === 0 
-      ? 'bg-blue-50 border-blue-200' 
-      : 'bg-gray-50 border-gray-200';
-  };
-
-  const getLogoGradient = (index: number) => {
-    return index % 2 === 0
-      ? 'from-[#1877F2] to-[#1565C0]'
-      : 'from-gray-900 to-gray-700';
-  };
-
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-6 min-h-[550px] flex flex-col">
+    <div className="bg-white rounded-2xl shadow-xl p-6 h-full flex flex-col">
       {/* Header */}
-      <div className="flex justify-center items-center mb-4 relative">
-        <div className="text-center">
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-2">
           <span className="text-xl font-extrabold text-gray-900">Party Menu Bidding</span>
-          <span className="ml-2">ℹ️</span>
+          <span className="text-blue-500">ℹ️</span>
         </div>
-        <span className="absolute right-0 bg-[#1877F2] text-white px-3 py-1 rounded-full text-xs font-medium">
+        <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
           LIVE
         </span>
       </div>
 
-      {/* Countdown Timer */}
-      <div className="bg-gradient-to-r from-[#1877F2] to-[#1565C0] text-white px-4 py-3 rounded-lg text-center font-bold mb-4 shadow-lg">
+      {/* Timer */}
+      <div className="bg-[#1877F2] text-white px-4 py-3 rounded-lg text-center font-bold mb-4">
         ⏰ {formatTime(timeRemaining)} remaining
       </div>
 
-      {/* Savings Display */}
-      <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white p-4 rounded-xl text-center mb-5 shadow-lg">
-        <div className="text-2xl font-extrabold mb-1">Save $284</div>
+      {/* Savings */}
+      <div className="bg-gray-900 text-white p-4 rounded-lg text-center mb-4">
+        <div className="text-2xl font-bold">Save $284</div>
         <div className="text-sm opacity-90">🎯 Average 18% below market price</div>
       </div>
 
       {/* Restaurant List */}
-      <div className="flex-1 overflow-y-auto mb-4 space-y-3 max-h-96 pr-2">
-        {liveRestaurants.map((restaurant, index) => (
-          <div
-            key={restaurant.id}
-            className={`rounded-lg p-3 border transition-all hover:shadow-md ${getBackgroundStyle(index)}`}
-          >
+      <div className="flex-1 overflow-y-auto space-y-3 mb-4">
+        {restaurants.map((restaurant, index) => (
+          <div key={restaurant.id} className="rounded-lg p-3 border hover:shadow-md transition-all bg-gray-50">
             <div className="flex justify-between items-start mb-2">
               <div className="flex gap-3 flex-1">
-                <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${getLogoGradient(index)} flex items-center justify-center text-white font-bold text-lg shadow-md`}>
+                <div className="w-10 h-10 rounded-lg bg-[#1877F2] flex items-center justify-center text-white font-bold shadow">
                   {restaurant.name.charAt(0)}
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-gray-900 mb-1">{restaurant.name}</h3>
-                  <div className="text-sm text-gray-600 mb-1">
-                    <span className="text-[#1877F2] font-semibold">⭐ {restaurant.rating}</span>
-                    <span className="mx-1">•</span>
-                    <span>{restaurant.distance} km</span>
-                    <span className="mx-1">•</span>
-                    <span className="font-semibold">{restaurant.cuisine}</span>
+                  <h3 className="font-bold text-gray-900">{restaurant.name}</h3>
+                  <div className="text-sm text-gray-600">
+                    ⭐ {restaurant.rating} • 📍 {restaurant.distance} km • {restaurant.cuisine}
                   </div>
-                  <div className="text-sm text-gray-600">{restaurant.dish} • Serves {restaurant.serves}</div>
-                  <div className="flex items-center gap-1 text-xs text-gray-600 mt-1">
-                    <div className="w-2 h-2 rounded-full bg-[#1877F2] animate-pulse"></div>
-                    <span>👥 {restaurant.bidders} people bidding</span>
+                  <div className="text-sm text-gray-700 font-medium">
+                    {restaurant.dish} • Serves {restaurant.serves}
                   </div>
+                  {restaurant.bidders > 0 && (
+                    <div className="flex items-center gap-1 text-xs text-gray-600 mt-1">
+                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                      <span>👥 {restaurant.bidders} people bidding</span>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className={`text-2xl font-bold ${index % 2 === 0 ? 'text-[#1877F2]' : 'text-gray-900'}`}>
+              <div className="text-2xl font-bold text-[#1877F2]">
                 ${restaurant.currentBid}
               </div>
             </div>
             
             {restaurant.progress > 0 && (
               <>
-                <div className="w-full h-1 bg-gray-200 rounded-full mb-2 overflow-hidden">
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-[#1877F2] to-[#1565C0] rounded-full transition-all duration-500"
+                    className="h-full bg-gradient-to-r from-[#1877F2] to-[#1565C0] transition-all duration-500"
                     style={{ width: `${restaurant.progress}%` }}
                   />
                 </div>
                 {restaurant.tag && (
-                  <div className="flex justify-center">
-                    <div className="bg-[#1877F2] text-white px-3 py-1 rounded-full text-sm flex items-center gap-1">
-                      {restaurant.tag}
-                    </div>
+                  <div className="mt-2 text-center">
+                    <span className="text-xs font-semibold text-[#1877F2]">{restaurant.tag}</span>
                   </div>
                 )}
               </>
@@ -169,13 +103,10 @@ export default function BiddingPanel({ restaurants }: BiddingPanelProps) {
 
       {/* Action Buttons */}
       <div className="space-y-2">
-        <button
-          onClick={placeBid}
-          className="w-full bg-[#1877F2] text-white font-semibold py-3 rounded-lg hover:bg-[#1565C0] transition-colors shadow-lg hover:shadow-xl"
-        >
+        <button className="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition-colors shadow-lg">
           🎯 Place Your Bid Now
         </button>
-        <button className="w-full bg-transparent text-gray-900 border-2 border-gray-900 font-semibold py-3 rounded-lg hover:bg-gray-900 hover:text-white transition-all">
+        <button className="w-full bg-white text-gray-900 border-2 border-gray-900 font-semibold py-3 rounded-lg hover:bg-gray-900 hover:text-white transition-all">
           ▶️ Watch Demo
         </button>
       </div>

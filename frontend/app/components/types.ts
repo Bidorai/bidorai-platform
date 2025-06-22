@@ -1,3 +1,4 @@
+// app/components/types.ts
 export interface Restaurant {
   id: string;
   name: string;
@@ -9,5 +10,11 @@ export interface Restaurant {
   bidders: number;
   currentBid: number;
   progress: number;
-  tag: string;
+  tag?: string;
+}
+
+export interface Location {
+  lat: number;
+  lng: number;
+  address: string;
 }
