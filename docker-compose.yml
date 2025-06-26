@@ -1,54 +1,76 @@
 version: '3.8'
-
 services:
-  web:
+  backend:
     build: ./backend
-    command: npm run start
     ports:
-      - "5000:5000"
+      - '4000:4000'
     environment:
-      - NODE_ENV=production
-      - PORT=5000
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - FRONTEND_URL=http://localhost:3000
+      - NODE_ENV=development
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/bidorai
+      - REDIS_URL=redis://redis:6379
     depends_on:
-      - postgres
+      - db
       - redis
-
-  postgres:
-    image: postgres:15
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-    ports:
-      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./backend:/usr/src/app
+    command: npm run dev
+
+  admin-frontend:
+    build: ./frontend/admin
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./frontend/admin:/usr/src/app
+    command: npm run dev
+
+  restaurant-frontend:
+    build: ./frontend/restaurant
+    ports:
+      - '3001:3000'
+    depends_on:
+      - backend
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./frontend/restaurant:/usr/src/app
+    command: npm run dev
+
+  customer-frontend:
+    build: ./frontend/customer
+    ports:
+      - '3002:3000'
+    depends_on:
+      - backend
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./frontend/customer:/usr/src/app
+    command: npm run dev
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bidorai
+    ports:
+      - '5432:5432'
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./database/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
 
   redis:
     image: redis:7
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - redis_data:/data
 
-  frontend:
-    build: ./frontend
-    command: npm run start
-    ports:
-      - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:5000
-    depends_on:
-      - web
-
 volumes:
-  postgres_data:
-  redis_data:
+  db_data:
+  redis_data: 
