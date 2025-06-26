@@ -1,36 +1,35 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { pool } from '../config/database';
 
-interface JwtPayload {
-  userId: number;
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
+export interface AuthRequest extends Request {
+  user?: {
+    id: number;
+    email: string;
+    role: string;
+  };
 }
 
-export const auth = async (req: Request, res: Response, next: NextFunction) => {
+export const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ message: 'Access token required' });
+  }
+
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Authentication required' });
-    }
-
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'your-secret-key'
-    ) as JwtPayload;
-
-    const user = await pool.query(
-      'SELECT id, username, email FROM users WHERE id = $1',
-      [decoded.userId]
-    );
-
-    if (!user.rows[0]) {
-      return res.status(401).json({ error: 'Invalid token' });
-    }
-
-    req.user = user.rows[0];
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    req.user = {
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role
+    };
     next();
   } catch (error) {
-    return res.status(401).json({ error: 'Authentication failed' });
+    return res.status(403).json({ message: 'Invalid token' });
   }
 };
+
+export default authenticateToken; 

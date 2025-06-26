@@ -1,39 +1,27 @@
 {
   "name": "bidorai-frontend",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "workspaces": ["customer", "restaurant", "admin", "shared"],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next start"
   },
   "dependencies": {
-    "@hookform/resolvers": "^3.3.0",
-    "@radix-ui/react-dialog": "^1.0.5",
-    "@radix-ui/react-dropdown-menu": "^2.0.6",
-    "@radix-ui/react-slot": "^1.0.2",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "autoprefixer": "^10.4.0",
-    "axios": "^1.10.0",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "date-fns": "^3.0.0",
-    "framer-motion": "^10.16.0",
-    "lucide-react": "^0.303.0",
-    "next": "14.2.0",
-    "next-auth": "^4.24.0",
-    "postcss": "^8.4.0",
-    "react": "^18",
-    "react-dom": "^18",
-    "react-hook-form": "^7.48.0",
-    "react-hot-toast": "^2.5.2",
-    "socket.io-client": "^4.8.1",
-    "tailwind-merge": "^2.6.0",
-    "tailwindcss": "^3.4.0",
-    "typescript": "^5",
-    "zod": "^3.22.0"
+    "next": "14.2.15",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "tailwindcss": "^3.4.1",
+    "lucide-react": "^0.518.0",
+    "clsx": "^2.1.1"
+  },
+  "devDependencies": {
+    "postcss": "^8.4.35",
+    "autoprefixer": "^10.4.17",
+    "typescript": "^5.3.3",
+    "@types/node": "^20.11.16",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1"
   }
-}
+} 
