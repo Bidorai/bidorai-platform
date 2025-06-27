@@ -81,22 +81,19 @@ export function BiddingCard({ timeRemaining, formatTime }: BiddingCardProps) {
         </div>
 
         {/* Restaurant Cards - Scrollable */}
-        <div className="flex-1 flex flex-col gap-2 mb-4 overflow-y-auto pr-2 max-h-72 custom-scrollbar">
+        <div className="flex-1 flex flex-col gap-2 mb-4 overflow-y-auto pr-2 max-h-96 custom-scrollbar">
           {activeBids.map((bid, index) => (
             <div 
               key={bid.id}
-              className={
-                `
+              className={`
                 ${index === 0 ? 'border-2 border-indigo-600 bg-indigo-50' : 'border border-gray-200 bg-white'} 
                 rounded-lg p-3 flex-shrink-0
-              `
-              }
+              `}
             >
               {index < 2 ? (
                 // Expanded view for first two
                 <div className="flex gap-3">
-                  <div className={
-                    `
+                  <div className={`
                     w-12 h-12 ${index === 0 ? 'bg-indigo-600' : 'bg-gray-600'} 
                     text-white rounded-lg flex items-center justify-center font-bold text-xl flex-shrink-0
                   `}>
@@ -160,7 +157,7 @@ export function BiddingCard({ timeRemaining, formatTime }: BiddingCardProps) {
         </div>
 
         {/* Action Buttons */}
-        <div className="pt-2">
+        <div className="pt-4">
           <button className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-bold text-lg mb-3 transition-all transform hover:scale-105 flex items-center justify-center gap-2">
             <span>🎯</span> Place Your Bid Now
           </button>
