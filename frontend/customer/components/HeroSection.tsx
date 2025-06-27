@@ -2,77 +2,102 @@
 
 import { useState, useEffect } from 'react';
 import { BiddingCard } from './BiddingCard';
-import { useBidding } from '@/hooks/useBidding';
 
 export function HeroSection() {
+  const [timeRemaining, setTimeRemaining] = useState(158);
+  const [location, setLocation] = useState('Dallas, TX');
+  const [partySize, setPartySize] = useState(15);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeRemaining(prev => prev > 0 ? prev - 1 : 0);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   return (
-    <section className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-black/20"></div>
-      
-      <div className="relative max-w-7xl mx-auto px-6 py-24 lg:py-32">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left Column - Content */}
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
-                Premium Catering at
-                <span className="block text-yellow-400">Unbeatable Prices</span>
-              </h1>
-              <p className="text-xl lg:text-2xl text-blue-100 leading-relaxed">
-                Join live auctions for premium catering packages. Save up to 25% while supporting local restaurants and enjoying guaranteed freshness.
-              </p>
+    <section className="bg-gradient-to-br from-blue-50 to-orange-50 py-16">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex gap-8 items-stretch">
+          {/* Left Content */}
+          <div className="flex-1 p-10 bg-white rounded-2xl shadow-lg flex flex-col items-center justify-center">
+            {/* Badge */}
+            <div className="inline-flex items-center bg-blue-50 rounded-full px-6 py-3 mb-6 border border-blue-200">
+              <span className="text-xl mr-2">🎉</span>
+              <span className="text-blue-600 font-medium">The world's first party tray food bidding app</span>
             </div>
-            
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button className="bg-yellow-400 hover:bg-yellow-300 text-blue-900 px-8 py-4 rounded-lg font-bold text-lg transition-colors duration-200 transform hover:scale-105">
-                🎯 Join Live Auction
+
+            {/* Heading */}
+            <h1 className="text-5xl lg:text-6xl font-black text-center mb-6 leading-tight">
+              <div className="text-gray-900">Bid your Meal.</div>
+              <div className="text-blue-600">Win your Order.</div>
+              <div className="text-orange-500">Feast your Party.</div>
+            </h1>
+
+            {/* Subheading */}
+            <p className="text-lg text-gray-600 text-center mb-8 w-full">
+              Bid on delicious half & full tray meals from local restaurants.{' '}
+              <span className="text-blue-600 font-semibold">Name your price</span> and pick it up fresh.
+            </p>
+
+            {/* Location and Party Size */}
+            <div className="flex items-center bg-gray-50 rounded-full p-1 shadow-sm border border-gray-200 mb-8 w-full">
+              <div className="flex items-center flex-1 px-5 py-3">
+                <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span className="text-gray-700 font-medium">{location}</span>
+              </div>
+              
+              <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full text-sm font-semibold transition-colors flex items-center gap-1 mr-2">
+                <span>📍</span> Use My Location
               </button>
-              <button className="border-2 border-white hover:bg-white hover:text-blue-900 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors duration-200">
-                📱 Download App
-              </button>
+              
+              <div className="w-px h-8 bg-gray-300 mx-4"></div>
+              
+              <div className="flex items-center px-5 py-3">
+                <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                <input 
+                  type="number" 
+                  value={partySize} 
+                  onChange={(e) => setPartySize(parseInt(e.target.value) || 1)}
+                  className="w-10 text-gray-700 font-medium text-center outline-none bg-transparent"
+                />
+              </div>
             </div>
-            
-            <div className="flex items-center gap-8 text-blue-100">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">⭐</span>
-                <span>4.9/5 Rating</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">🍽️</span>
-                <span>500+ Restaurants</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">💰</span>
-                <span>25% Average Savings</span>
-              </div>
+
+            {/* CTA Button */}
+            <button className="bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 mb-8 shadow-lg transition-all transform hover:scale-105 w-full">
+              <span>🍽️</span> Find My Perfect Party Menu
+            </button>
+
+            {/* Bottom Info */}
+            <div className="flex items-center gap-2 text-gray-600 mb-4">
+              <span className="text-xl">🚀</span>
+              <span className="font-medium">Now launching in Dallas, TX</span>
+            </div>
+
+            <div className="bg-blue-50 rounded-xl px-6 py-4 flex items-center justify-center gap-3 border border-blue-200 w-full">
+              <span className="text-2xl">💰</span>
+              <span className="text-blue-700 font-semibold">$1 Tray Bids every Friday. Limited spots only.</span>
             </div>
           </div>
-          
-          {/* Right Column - Visual */}
-          <div className="relative">
-            <div className="bg-white/10 backdrop-blur rounded-2xl p-8 border border-white/20">
-              <div className="text-center space-y-4">
-                <div className="w-24 h-24 bg-yellow-400 rounded-full flex items-center justify-center text-4xl mx-auto">
-                  🍽️
-                </div>
-                <h3 className="text-2xl font-bold">Live Auction in Progress</h3>
-                <p className="text-blue-100">Premium catering package from Farm Fresh Kitchen</p>
-                <div className="bg-blue-800/50 rounded-lg p-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-blue-200">Current Bid</span>
-                    <span className="text-2xl font-bold text-yellow-400">$65</span>
-                  </div>
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-sm text-blue-200">Time Left</span>
-                    <span className="text-lg font-semibold text-red-400">2:45</span>
-                  </div>
-                  <button className="w-full bg-yellow-400 hover:bg-yellow-300 text-blue-900 py-3 rounded-lg font-bold transition-colors">
-                    Place Bid
-                  </button>
-                </div>
-              </div>
-            </div>
+
+          {/* Right Content - Bidding Card */}
+          <div className="flex-1">
+            <BiddingCard 
+              timeRemaining={timeRemaining} 
+              formatTime={formatTime}
+            />
           </div>
         </div>
       </div>

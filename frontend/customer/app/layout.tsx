@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { SearchBar } from '../components/SearchBar'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -29,15 +30,11 @@ export default function RootLayout({
             </a>
             {/* Center: Search Bar */}
             <div className="flex-1 flex justify-center">
-              <input
-                className="w-[350px] px-4 py-2 rounded bg-gray-100 border border-gray-200 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Search restaurants, cuisines…"
-                disabled
-              />
+              <SearchBar />
             </div>
             {/* Right: Phone, Links, Cart, Auth */}
             <div className="flex items-center space-x-6">
-              <span className="text-blue-700 font-semibold whitespace-nowrap">1-800-BIDORAI</span>
+              <span className="text-red-600 font-semibold whitespace-nowrap">1-800-BIDORAI</span>
               <a href="#" className="text-gray-600 hover:text-blue-700 whitespace-nowrap">For Restaurants</a>
               <div className="relative">
                 <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-1.5">2</span>

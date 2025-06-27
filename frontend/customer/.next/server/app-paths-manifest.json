@@ -2,11 +2,12 @@
   "/_not-found": "app/_not-found.js",
   "/auth/page": "app/auth/page.js",
   "/dashboard/page": "app/dashboard/page.js",
-  "/menu/page": "app/menu/page.js",
   "/notifications/page": "app/notifications/page.js",
+  "/menu/page": "app/menu/page.js",
   "/orders/page": "app/orders/page.js",
   "/page": "app/page.js",
   "/review/page": "app/review/page.js",
+  "/search/page": "app/search/page.js",
   "/bidding/page": "app/bidding/page.js",
   "/payment/page": "app/payment/page.js"
 }
