@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-import { redis } from '../config/redis';
+import { redis, getRedisClient } from '../config/redis';
 
 export class BiddingService {
   private pool: Pool;
@@ -18,12 +18,19 @@ export class BiddingService {
       [menuId, startTime, endTime]
     );
     
-    // Store in Redis for real-time access
-    await redis.setEx(
-      `bidding:${result.rows[0].id}`,
-      duration * 60,
-      JSON.stringify(result.rows[0])
-    );
+    // Store in Redis for real-time access (if available)
+    const redisClient = getRedisClient();
+    if (redisClient) {
+      try {
+        await redisClient.setEx(
+          `bidding:${result.rows[0].id}`,
+          duration * 60,
+          JSON.stringify(result.rows[0])
+        );
+      } catch (error) {
+        console.warn('Failed to store bidding session in Redis:', error);
+      }
+    }
     
     return result.rows[0];
   }
@@ -40,19 +47,35 @@ export class BiddingService {
       [userId, session.menu_id, amount]
     );
     
-    // Update Redis with current highest bid
-    await redis.zAdd(`bids:${sessionId}`, [{
-      score: amount,
-      value: `${userId}:${result.rows[0].id}`
-    }]);
+    // Update Redis with current highest bid (if available)
+    const redisClient = getRedisClient();
+    if (redisClient) {
+      try {
+        await redisClient.zAdd(`bids:${sessionId}`, [{
+          score: amount,
+          value: `${userId}:${result.rows[0].id}`
+        }]);
+      } catch (error) {
+        console.warn('Failed to update Redis with bid:', error);
+      }
+    }
     
     return result.rows[0];
   }
 
   async getActiveSession(sessionId: number) {
-    const cached = await redis.get(`bidding:${sessionId}`);
-    if (cached) return JSON.parse(cached);
+    // Try to get from Redis first (if available)
+    const redisClient = getRedisClient();
+    if (redisClient) {
+      try {
+        const cached = await redisClient.get(`bidding:${sessionId}`);
+        if (cached) return JSON.parse(cached);
+      } catch (error) {
+        console.warn('Failed to get session from Redis:', error);
+      }
+    }
     
+    // Fallback to database
     const result = await this.pool.query(
       `SELECT * FROM bidding_sessions 
        WHERE id = $1 AND status = 'active' AND end_time > NOW()`,
@@ -63,8 +86,36 @@ export class BiddingService {
   }
 
   async endSession(sessionId: number) {
-    // Get highest bid
-    const highestBids = await redis.zRangeWithScores(`bids:${sessionId}`, 0, 0, { REV: true });
+    // Get highest bid from Redis (if available)
+    const redisClient = getRedisClient();
+    let highestBids: any[] = [];
+    
+    if (redisClient) {
+      try {
+        highestBids = await redisClient.zRangeWithScores(`bids:${sessionId}`, 0, 0, { REV: true });
+      } catch (error) {
+        console.warn('Failed to get bids from Redis, falling back to database:', error);
+      }
+    }
+    
+    // If Redis failed or is unavailable, get highest bid from database
+    if (highestBids.length === 0) {
+      const result = await this.pool.query(
+        `SELECT b.* FROM bids b
+         JOIN bidding_sessions bs ON bs.menu_id = b.menu_id
+         WHERE bs.id = $1 AND b.created_at >= bs.start_time
+         ORDER BY b.amount DESC LIMIT 1`,
+        [sessionId]
+      );
+      
+      if (result.rows.length > 0) {
+        const highestBid = result.rows[0];
+        highestBids = [{
+          value: `${highestBid.user_id}:${highestBid.id}`,
+          score: highestBid.amount
+        }];
+      }
+    }
     
     if (highestBids.length > 0) {
       const { value: bidKey, score: amount } = highestBids[0];
@@ -88,9 +139,15 @@ export class BiddingService {
       );
     }
     
-    // Clean up Redis
-    await redis.del(`bidding:${sessionId}`);
-    await redis.del(`bids:${sessionId}`);
+    // Clean up Redis (if available)
+    if (redisClient) {
+      try {
+        await redisClient.del(`bidding:${sessionId}`);
+        await redisClient.del(`bids:${sessionId}`);
+      } catch (error) {
+        console.warn('Failed to clean up Redis:', error);
+      }
+    }
   }
 
   async createSecondChanceOffers(sessionId: number, winningBidId: number, winningAmount: number) {

@@ -1,1 +1,5 @@
-{"headers":{"x-next-cache-tags":"_N_T_/layout,_N_T_/bidding/layout,_N_T_/bidding/page,_N_T_/bidding"}}
+{
+  "headers": {
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/bidding/layout,_N_T_/bidding/page,_N_T_/bidding"
+  }
+}

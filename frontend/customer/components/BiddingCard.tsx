@@ -1,54 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-
-interface BiddingCardProps {
-  timeRemaining: number;
-  formatTime: (seconds: number) => string;
-}
-
-export function BiddingCard({ timeRemaining, formatTime }: BiddingCardProps) {
-  const [activeBids] = useState([
-    { 
-      id: 1, 
-      restaurant: 'Farm Fresh Kitchen', 
-      amount: 217, 
-      rating: 4.9, 
-      distance: 0.8, 
-      tags: ['Organic Certified'], 
-      serve: 'Organic Harvest Bowl', 
-      serves: 15, 
-      bidders: 8, 
-      icon: 'F' 
-    },
-    { 
-      id: 2, 
-      restaurant: 'Green Garden Bistro', 
-      amount: 185, 
-      rating: 4.8, 
-      distance: 1.2, 
-      tags: ['Farm-to-Table'], 
-      serve: 'Sustainable Feast Tray', 
-      serves: 12, 
-      bidders: 12, 
-      icon: 'G' 
-    },
-    { 
-      id: 3, 
-      restaurant: 'Tokyo Sushi', 
-      amount: 165, 
-      rating: 4.7, 
-      distance: 2.1, 
-      tags: ['Fresh Daily'], 
-      serve: 'Premium Sushi Platter', 
-      serves: 10, 
-      bidders: 5, 
-      icon: 'T' 
-    }
-  ]);
+export function BiddingCard() {
+  // Mock data for demonstration
+  const activeBids = [
+    { id: 1, restaurant: 'Farm Fresh Kitchen', amount: 217, rating: 4.9, distance: 0.8, tags: ['Organic Certified'], serve: 'Organic Harvest Bowl', serves: 15, bidders: 8, icon: 'F' },
+    { id: 2, restaurant: 'Green Garden Bistro', amount: 185, rating: 4.8, distance: 1.2, tags: ['Farm-to-Table'], serve: 'Sustainable Feast Tray', serves: 12, bidders: 12, icon: 'G' },
+    { id: 3, restaurant: 'Tokyo Sushi', amount: 165, rating: 4.7, distance: 2.1, tags: ['Fresh Daily'], serve: 'Premium Sushi Platter', serves: 10, bidders: 5, icon: 'T' }
+  ];
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg flex flex-col h-full">
+    <div className="bg-white rounded-2xl shadow-lg flex flex-col h-full w-full flex-1 min-w-0">
       <div className="p-5 flex flex-col flex-1">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
@@ -60,17 +21,15 @@ export function BiddingCard({ timeRemaining, formatTime }: BiddingCardProps) {
             Live
           </span>
         </div>
-
         {/* Timer */}
         <div className="bg-indigo-600 text-white rounded-lg px-4 py-3 mb-4 text-center">
           <div className="flex items-center justify-center gap-2">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span className="font-bold text-lg">{formatTime(timeRemaining)} remaining</span>
+            <span className="font-bold text-lg">2:38 remaining</span>
           </div>
         </div>
-
         {/* Savings Banner */}
         <div className="bg-gray-900 text-white rounded-lg px-4 py-4 text-center mb-4">
           <div className="text-2xl font-bold mb-1">Save $284</div>
@@ -79,9 +38,8 @@ export function BiddingCard({ timeRemaining, formatTime }: BiddingCardProps) {
             <span>Average 18% below market price</span>
           </div>
         </div>
-
         {/* Restaurant Cards - Scrollable */}
-        <div className="flex-1 flex flex-col gap-2 mb-4 overflow-y-auto pr-2 max-h-96 custom-scrollbar">
+        <div className="flex-1 flex flex-col gap-2 mb-4 overflow-y-auto pr-2 max-h-72 custom-scrollbar">
           {activeBids.map((bid, index) => (
             <div 
               key={bid.id}
@@ -155,13 +113,11 @@ export function BiddingCard({ timeRemaining, formatTime }: BiddingCardProps) {
             </div>
           ))}
         </div>
-
         {/* Action Buttons */}
         <div className="pt-4">
           <button className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-bold text-lg mb-3 transition-all transform hover:scale-105 flex items-center justify-center gap-2">
             <span>🎯</span> Place Your Bid Now
           </button>
-
           <button className="w-full bg-white hover:bg-gray-50 text-blue-600 border-2 border-gray-200 py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2">
             <span>▶️</span> Watch Demo
           </button>

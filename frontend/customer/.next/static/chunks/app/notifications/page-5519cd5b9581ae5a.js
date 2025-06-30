@@ -1,9 +1,0 @@
-(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[193],{5766:function(e,t,r){Promise.resolve().then(r.bind(r,9123))},9123:function(e,t,r){"use strict";r.r(t),r.d(t,{default:function(){return CustomerNotificationsPage}});var n=r(7437),s=r(2265);function CustomerNotificationsPage(){let[e,t]=(0,s.useState)([]);return(0,s.useEffect)(()=>{fetch("http://localhost:4000/notifications-history/customer?user_id=1").then(e=>e.json()).then(t)},[]),(0,n.jsxs)("main",{className:"p-8",children:[(0,n.jsx)("h2",{className:"text-2xl font-bold mb-4",children:"Notification History"}),(0,n.jsxs)("ul",{className:"border rounded p-2",children:[0===e.length&&(0,n.jsx)("li",{children:"No notifications."}),e.map(e=>(0,n.jsxs)("li",{className:"mb-2",children:[(0,n.jsx)("span",{children:e.message}),(0,n.jsx)("span",{className:"ml-4 text-gray-500 text-sm",children:e.created_at})]},e.id))]})]})}},622:function(e,t,r){"use strict";/**
- * @license React
- * react-jsx-runtime.production.min.js
- *
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */var n=r(2265),s=Symbol.for("react.element"),o=Symbol.for("react.fragment"),i=Object.prototype.hasOwnProperty,a=n.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner,c={key:!0,ref:!0,__self:!0,__source:!0};function q(e,t,r){var n,o={},l=null,f=null;for(n in void 0!==r&&(l=""+r),void 0!==t.key&&(l=""+t.key),void 0!==t.ref&&(f=t.ref),t)i.call(t,n)&&!c.hasOwnProperty(n)&&(o[n]=t[n]);if(e&&e.defaultProps)for(n in t=e.defaultProps)void 0===o[n]&&(o[n]=t[n]);return{$$typeof:s,type:e,key:l,ref:f,props:o,_owner:a.current}}t.Fragment=o,t.jsx=q,t.jsxs=q},7437:function(e,t,r){"use strict";e.exports=r(622)}},function(e){e.O(0,[971,472,744],function(){return e(e.s=5766)}),_N_E=e.O()}]);
