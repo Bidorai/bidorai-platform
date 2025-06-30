@@ -1,19 +1,32 @@
 "use client";
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useUser, useClerk } from '@clerk/nextjs';
 import { HeroSection } from '../components/HeroSection';
 import { HowItWorks } from '../components/HowItWorks';
 import { FeaturedRestaurants } from '../components/FeaturedRestaurants';
 import { WhyChoose } from '../components/WhyChoose';
 import { Testimonials } from '../components/Testimonials';
 import { CTASection } from '../components/CTASection';
-// import { useBidding } from '../hooks/useBidding'; // Uncomment and implement if needed
 
 export default function HomePage() {
   const [location, setLocation] = useState("Dallas, TX");
   const [partySize, setPartySize] = useState(15);
-  // const { activeSessions, joinSession } = useBidding(); // Uncomment and implement if needed
+  const router = useRouter();
+  const { isSignedIn } = useUser();
+  const { loaded } = useClerk();
+
+  // Only redirect if user is signed in and Clerk is loaded
+  useEffect(() => {
+    if (loaded && isSignedIn) {
+      // Add a small delay to ensure the authentication state is fully processed
+      const timer = setTimeout(() => {
+        router.push('/dashboard');
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isSignedIn, loaded, router]);
 
   // Mock data for BiddingCard
   const mockSession = {
@@ -39,6 +52,18 @@ export default function HomePage() {
     console.log('Joining session:', sessionId);
     // TODO: Implement actual bidding logic
   };
+
+  // Show loading state while Clerk is loading
+  if (!loaded) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen">
