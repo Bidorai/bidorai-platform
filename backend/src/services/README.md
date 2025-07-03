@@ -1,3 +1,3 @@
 # services
 
-Business logic and service functions for Bidorai backend. 
+Business logic and service functions for Bidovio backend. 

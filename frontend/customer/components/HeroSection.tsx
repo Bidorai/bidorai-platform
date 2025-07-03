@@ -24,7 +24,11 @@ export function HeroSection() {
 
   const handleFindMenu = () => {
     if (selectedLocation) {
-      alert(`Selected address: ${selectedLocation.address}\nParty size: ${partySize}`);
+      const searchParams = new URLSearchParams({
+        location: selectedLocation.address,
+        partySize: partySize.toString()
+      });
+      window.location.href = `/search?${searchParams.toString()}`;
     }
   };
 

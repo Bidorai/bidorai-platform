@@ -106,7 +106,6 @@ export default function AuthPage() {
         password: signupForm.password,
         name: signupForm.name,
         role: signupForm.role,
-        permissions: ['read', 'write'],
       });
 
       if (success) {
@@ -127,13 +126,13 @@ export default function AuthPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <div className="flex justify-center">
-            <img src="/logo.png" alt="Bidorai" className="w-12 h-12" />
+            <img src="/logo.png" alt="Bidovio" className="w-12 h-12" />
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             {isSignUp ? 'Create Admin Account' : 'Sign in to Admin Portal'}
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            {isSignUp ? 'Join Bidorai as an administrator' : 'Manage the Bidorai platform'}
+            {isSignUp ? 'Join Bidovio as an administrator' : 'Manage the Bidovio platform'}
           </p>
         </div>
 

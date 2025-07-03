@@ -14,7 +14,7 @@ export default function HelpPage() {
     'getting-started': [
       {
         title: "Creating Your Account",
-        content: "Sign up for Bidorai by clicking the 'Sign Up' button in the top right corner. You can use your email or sign up with Google/Facebook for faster access. Verify your email address to complete the registration process.",
+        content: "Sign up for Bidovio by clicking the 'Sign Up' button in the top right corner. You can use your email or sign up with Google/Facebook for faster access. Verify your email address to complete the registration process.",
         icon: "👤"
       },
       {
@@ -29,7 +29,7 @@ export default function HelpPage() {
       },
       {
         title: "Understanding the Platform",
-        content: "Bidorai works through competitive bidding. Restaurants list party trays with starting prices, and customers place bids. The highest bidder when the auction ends wins the food at their bid price.",
+        content: "Bidovio works through competitive bidding. Restaurants list party trays with starting prices, and customers place bids. The highest bidder when the auction ends wins the food at their bid price.",
         icon: "📚"
       }
     ],
@@ -138,7 +138,7 @@ export default function HelpPage() {
         <div className="max-w-7xl mx-auto px-6 text-center">
           <h1 className="text-5xl font-bold mb-6">Help Center</h1>
           <p className="text-xl max-w-3xl mx-auto">
-            Everything you need to know about using Bidorai. Find answers to common questions, 
+            Everything you need to know about using Bidovio. Find answers to common questions, 
             learn how to get started, and get the most out of our platform.
           </p>
         </div>
@@ -229,7 +229,7 @@ export default function HelpPage() {
               <p className="text-gray-600 text-sm mb-4">
                 Send us a detailed message
               </p>
-              <a href="mailto:support@bidorai.com" className="text-green-600 hover:text-green-800 font-medium">
+              <a href="mailto:support@bidovio.com" className="text-green-600 hover:text-green-800 font-medium">
                 Send Email →
               </a>
             </div>
@@ -293,7 +293,7 @@ export default function HelpPage() {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-6">Still Need Help?</h2>
           <p className="text-xl mb-8">
-            Our support team is here to help you get the most out of Bidorai.
+            Our support team is here to help you get the most out of Bidovio.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a

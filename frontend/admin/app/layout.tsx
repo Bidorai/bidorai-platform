@@ -6,8 +6,8 @@ import { AuthProvider } from './contexts/AuthContext'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Bidorai - Admin Portal',
-  description: 'Admin portal for managing Bidorai platform',
+      title: 'Bidovio - Admin Portal',
+      description: 'Admin portal for managing Bidovio platform',
 }
 
 export default function RootLayout({

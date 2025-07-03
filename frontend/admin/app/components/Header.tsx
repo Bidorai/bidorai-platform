@@ -51,8 +51,8 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <img src="/logo.png" alt="Bidorai" className="w-8 h-8 mr-2" />
-            <span className="font-bold text-xl text-blue-700">Bidorai Admin</span>
+                    <img src="/logo.png" alt="Bidovio" className="w-8 h-8 mr-2" />
+        <span className="font-bold text-xl text-blue-700">Bidovio Admin</span>
           </div>
 
           {/* Navigation */}

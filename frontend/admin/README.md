@@ -1,3 +1,3 @@
 # Admin Dashboard
 
-This is the admin dashboard Next.js app for Bidorai. 
+This is the admin dashboard Next.js app for Bidovio. 

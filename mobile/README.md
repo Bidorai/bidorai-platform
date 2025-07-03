@@ -1,3 +1,3 @@
-# Bidorai Mobile App
+# Bidovio Mobile App
 
-This folder will contain the React Native mobile app for Bidorai. (MVP: placeholder) 
+This folder will contain the React Native mobile app for Bidovio. (MVP: placeholder) 

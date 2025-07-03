@@ -20,6 +20,8 @@
   "/review/page": "app/review/page.js",
   "/search/page": "app/search/page.js",
   "/terms/page": "app/terms/page.js",
+  "/bidding/page": "app/bidding/page.js",
+  "/payment/page": "app/payment/page.js",
   "/restaurantowners/analytics/page": "app/restaurantowners/analytics/page.js",
   "/restaurantowners/auth/page": "app/restaurantowners/auth/page.js",
   "/restaurantowners/bidding/page": "app/restaurantowners/bidding/page.js",
@@ -29,7 +31,5 @@
   "/restaurantowners/onboarding/page": "app/restaurantowners/onboarding/page.js",
   "/restaurantowners/orders/page": "app/restaurantowners/orders/page.js",
   "/restaurantowners/page": "app/restaurantowners/page.js",
-  "/restaurantowners/profile/page": "app/restaurantowners/profile/page.js",
-  "/bidding/page": "app/bidding/page.js",
-  "/payment/page": "app/payment/page.js"
+  "/restaurantowners/profile/page": "app/restaurantowners/profile/page.js"
 }

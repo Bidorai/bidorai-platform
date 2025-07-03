@@ -4,7 +4,7 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-20">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <h1 className="text-5xl font-bold mb-6">About Bidorai</h1>
+          <h1 className="text-5xl font-bold mb-6">About Bidovio</h1>
           <p className="text-xl max-w-3xl mx-auto">
             Revolutionizing the food industry by connecting communities with premium fresh food through innovative bidding technology and restaurant partnerships.
           </p>
@@ -43,7 +43,7 @@ export default function AboutPage() {
           <h2 className="text-3xl font-bold text-center mb-12">Our Story</h2>
           <div className="max-w-4xl mx-auto">
             <p className="text-lg text-gray-600 mb-6">
-              Bidorai was founded in 2024 by a team of food enthusiasts and technology innovators who recognized a fundamental problem in the food industry: 
+              Bidovio was founded in 2024 by a team of food enthusiasts and technology innovators who recognized a fundamental problem in the food industry: 
               restaurants were struggling with food waste and inconsistent revenue, while customers were looking for better deals on quality food.
             </p>
             <p className="text-lg text-gray-600 mb-6">
@@ -52,7 +52,7 @@ export default function AboutPage() {
               value for their food while customers enjoy premium quality at competitive prices.
             </p>
             <p className="text-lg text-gray-600">
-              Today, Bidorai is proud to be at the forefront of the food technology revolution, helping to create a more sustainable and equitable 
+              Today, Bidovio is proud to be at the forefront of the food technology revolution, helping to create a more sustainable and equitable 
               food ecosystem for everyone involved.
             </p>
           </div>
@@ -143,7 +143,7 @@ export default function AboutPage() {
       {/* Stats Section */}
       <section className="bg-gray-900 text-white py-20">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-12">Bidorai by the Numbers</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">Bidovio by the Numbers</h2>
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
               <div className="text-4xl font-bold text-blue-400 mb-2">500+</div>
@@ -170,7 +170,7 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-6">Get in Touch</h2>
           <p className="text-xl text-gray-600 mb-8">
-            Have questions about Bidorai? We'd love to hear from you.
+            Have questions about Bidovio? We'd love to hear from you.
           </p>
           <div className="grid md:grid-cols-3 gap-8">
             <div>
@@ -180,7 +180,7 @@ export default function AboutPage() {
                 </svg>
               </div>
               <h3 className="font-semibold mb-2">Phone</h3>
-              <p className="text-gray-600">1-800-BIDORAI</p>
+              <p className="text-gray-600">1-800-BIDOVIO</p>
             </div>
             <div>
               <div className="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -189,7 +189,7 @@ export default function AboutPage() {
                 </svg>
               </div>
               <h3 className="font-semibold mb-2">Email</h3>
-              <p className="text-gray-600">hello@bidorai.com</p>
+              <p className="text-gray-600">hello@bidovio.com</p>
             </div>
             <div>
               <div className="bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">

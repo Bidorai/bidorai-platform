@@ -1,3 +1,3 @@
 # controllers
 
-Express route controllers for Bidorai backend. 
+Express route controllers for Bidovio backend. 

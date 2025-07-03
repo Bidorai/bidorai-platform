@@ -1,5 +1,5 @@
 {
-  "name": "bidorai-frontend",
+  "name": "bidovio-frontend",
   "version": "1.0.0",
   "private": true,
   "workspaces": ["customer", "restaurant", "admin", "shared"],

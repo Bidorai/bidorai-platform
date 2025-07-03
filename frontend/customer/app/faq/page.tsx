@@ -29,16 +29,16 @@ export default function FAQPage() {
       title: "Getting Started",
       items: [
         {
-          question: "How does Bidorai work?",
-          answer: "Bidorai is a competitive bidding platform for party food. Restaurants list their party trays with starting prices, and customers place bids. The highest bidder when the auction ends wins the food at their bid price. It's a win-win: restaurants get fair market value, and customers get great deals on quality food."
+          question: "How does Bidovio work?",
+          answer: "Bidovio is a competitive bidding platform for party food. Restaurants list their party trays with starting prices, and customers place bids. The highest bidder when the auction ends wins the food at their bid price. It's a win-win: restaurants get fair market value, and customers get great deals on quality food."
         },
         {
           question: "How do I create an account?",
           answer: "Creating an account is easy! Click the 'Sign Up' button in the top right corner, fill in your details, and verify your email. You can also sign up using your Google or Facebook account for even faster access."
         },
         {
-          question: "Is Bidorai available in my area?",
-          answer: "Bidorai is currently available in major metropolitan areas across the United States. We're expanding rapidly, so if we're not in your area yet, sign up for our newsletter to be notified when we launch in your city."
+          question: "Is Bidovio available in my area?",
+          answer: "Bidovio is currently available in major metropolitan areas across the United States. We're expanding rapidly, so if we're not in your area yet, sign up for our newsletter to be notified when we launch in your city."
         },
         {
           question: "What types of food can I bid on?",
@@ -113,11 +113,11 @@ export default function FAQPage() {
       title: "Restaurant Partners",
       items: [
         {
-          question: "How do restaurants benefit from Bidorai?",
-          answer: "Restaurants use Bidorai to sell excess inventory, reduce food waste, and reach new customers. They set their own starting prices and get fair market value through competitive bidding, all while building customer relationships."
+          question: "How do restaurants benefit from Bidovio?",
+          answer: "Restaurants use Bidovio to sell excess inventory, reduce food waste, and reach new customers. They set their own starting prices and get fair market value through competitive bidding, all while building customer relationships."
         },
         {
-          question: "How can my restaurant join Bidorai?",
+          question: "How can my restaurant join Bidovio?",
           answer: "We'd love to have your restaurant on board! Visit our restaurant portal to learn more about the partnership process. Our team will guide you through onboarding, menu setup, and best practices for success."
         },
         {
@@ -126,7 +126,7 @@ export default function FAQPage() {
         },
         {
           question: "How much does it cost restaurants to join?",
-          answer: "There's no upfront cost to join Bidorai. We only take a small percentage of successful sales, so restaurants only pay when they make money. We also provide marketing support and analytics to help restaurants succeed."
+          answer: "There's no upfront cost to join Bidovio. We only take a small percentage of successful sales, so restaurants only pay when they make money. We also provide marketing support and analytics to help restaurants succeed."
         }
       ]
     },
@@ -142,8 +142,8 @@ export default function FAQPage() {
           answer: "Check your notification settings in your account preferences. Make sure you have email and push notifications enabled. Also verify that our emails aren't going to your spam folder."
         },
         {
-          question: "Can I use Bidorai on my mobile device?",
-          answer: "Yes! Bidorai is fully optimized for mobile devices. You can access all features through your mobile browser, and we're working on native mobile apps for even better experience."
+          question: "Can I use Bidovio on my mobile device?",
+          answer: "Yes! Bidovio is fully optimized for mobile devices. You can access all features through your mobile browser, and we're working on native mobile apps for even better experience."
         },
         {
           question: "How do I reset my password?",
@@ -160,7 +160,7 @@ export default function FAQPage() {
         <div className="max-w-7xl mx-auto px-6 text-center">
           <h1 className="text-5xl font-bold mb-6">Frequently Asked Questions</h1>
           <p className="text-xl max-w-3xl mx-auto">
-            Find answers to common questions about Bidorai, bidding, orders, and more. 
+            Find answers to common questions about Bidovio, bidding, orders, and more. 
             Can't find what you're looking for? Contact our support team.
           </p>
         </div>
@@ -257,7 +257,7 @@ export default function FAQPage() {
               </div>
               <h3 className="text-lg font-semibold mb-2">Help Center</h3>
               <p className="text-gray-600 text-sm mb-4">
-                Detailed guides and tutorials for using Bidorai
+                Detailed guides and tutorials for using Bidovio
               </p>
               <a href="#" className="text-blue-600 hover:text-blue-800 font-medium">
                 Visit Help Center →

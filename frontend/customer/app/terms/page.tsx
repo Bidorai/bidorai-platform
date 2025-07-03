@@ -11,7 +11,7 @@ export default function TermsPage() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Acceptance of Terms</h2>
               <p className="text-gray-700 mb-4">
-                By accessing and using the Bidorai platform, you accept and agree to be bound by the terms and provision of this agreement. 
+                By accessing and using the Bidovio platform, you accept and agree to be bound by the terms and provision of this agreement. 
                 If you do not agree to abide by the above, please do not use this service.
               </p>
             </section>
@@ -19,7 +19,7 @@ export default function TermsPage() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Description of Service</h2>
               <p className="text-gray-700 mb-4">
-                Bidorai is a competitive bidding platform that connects customers with restaurants for party food orders. 
+                Bidovio is a competitive bidding platform that connects customers with restaurants for party food orders. 
                 Our service allows restaurants to list party trays and customers to place competitive bids on these items.
               </p>
             </section>
@@ -49,7 +49,7 @@ export default function TermsPage() {
                   The highest bidder at the end of an auction period wins the item and is obligated to complete the purchase.
                 </p>
                 <p className="text-gray-700">
-                  Bidorai reserves the right to cancel any auction or bid at any time for any reason, including but not limited to 
+                  Bidovio reserves the right to cancel any auction or bid at any time for any reason, including but not limited to 
                   suspected fraud, technical issues, or violations of these terms.
                 </p>
               </div>
@@ -59,7 +59,7 @@ export default function TermsPage() {
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Payment Terms</h2>
               <div className="space-y-4">
                 <p className="text-gray-700">
-                  Payment is processed automatically when you win an auction. You authorize Bidorai to charge your payment method 
+                  Payment is processed automatically when you win an auction. You authorize Bidovio to charge your payment method 
                   for the full amount of your winning bid plus applicable taxes and fees.
                 </p>
                 <p className="text-gray-700">
@@ -79,7 +79,7 @@ export default function TermsPage() {
                   of the item and no refund will be provided.
                 </p>
                 <p className="text-gray-700">
-                  Bidorai is not responsible for the quality, safety, or condition of food items after pickup. 
+                  Bidovio is not responsible for the quality, safety, or condition of food items after pickup. 
                   Any issues with food quality should be addressed directly with the restaurant.
                 </p>
               </div>
@@ -105,7 +105,7 @@ export default function TermsPage() {
               <div className="space-y-4">
                 <p className="text-gray-700">
                   The Service and its original content, features, and functionality are and will remain the exclusive property 
-                  of Bidorai and its licensors. The Service is protected by copyright, trademark, and other laws.
+                  of Bidovio and its licensors. The Service is protected by copyright, trademark, and other laws.
                 </p>
                 <p className="text-gray-700">
                   You may not reproduce, distribute, modify, create derivative works of, publicly display, publicly perform, 

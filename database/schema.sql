@@ -1,4 +1,4 @@
--- Full schema for Bidorai
+-- Full schema for Bidovio
 -- Extend as needed for MVP and beyond
 
 -- Users, restaurants, menus, bids, orders, etc. 

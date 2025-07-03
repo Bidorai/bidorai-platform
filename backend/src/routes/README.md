@@ -1,3 +1,3 @@
 # routes
 
-Express route definitions for Bidorai backend. 
+Express route definitions for Bidovio backend. 

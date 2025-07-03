@@ -1,5 +1,6 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { authAPI } from '../services/api';
 
 interface AdminUser {
   id: string;
@@ -63,22 +64,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setIsLoading(true);
       
-      // Mock API call - replace with actual backend call
-      const response = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-        localStorage.setItem('admin_token', data.token);
-        localStorage.setItem('admin_user', JSON.stringify(data.user));
-        return true;
-      } else {
-        throw new Error('Login failed');
-      }
+      const response = await authAPI.login(email, password);
+      setUser(response.data.user);
+      localStorage.setItem('admin_token', response.data.token);
+      localStorage.setItem('admin_user', JSON.stringify(response.data.user));
+      return true;
     } catch (error) {
       console.error('Login error:', error);
       return false;
@@ -91,22 +81,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setIsLoading(true);
       
-      // Mock API call - replace with actual backend call
-      const response = await fetch('/api/admin/login-phone', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, otp }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-        localStorage.setItem('admin_token', data.token);
-        localStorage.setItem('admin_user', JSON.stringify(data.user));
-        return true;
-      } else {
-        throw new Error('Phone login failed');
-      }
+      const response = await authAPI.loginWithPhone(phone, otp);
+      setUser(response.data.user);
+      localStorage.setItem('admin_token', response.data.token);
+      localStorage.setItem('admin_user', JSON.stringify(response.data.user));
+      return true;
     } catch (error) {
       console.error('Phone login error:', error);
       return false;
@@ -119,24 +98,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setIsLoading(true);
       
-      // Mock API call - replace with actual backend call
-      const response = await fetch('/api/admin/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-        localStorage.setItem('admin_token', data.token);
-        localStorage.setItem('admin_user', JSON.stringify(data.user));
-        return true;
-      } else {
-        throw new Error('Signup failed');
-      }
-    } catch (error) {
+      const response = await authAPI.signup(userData);
+      setUser(response.data.user);
+      localStorage.setItem('admin_token', response.data.token);
+      localStorage.setItem('admin_user', JSON.stringify(response.data.user));
+      return true;
+    } catch (error: any) {
       console.error('Signup error:', error);
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        console.error('Error status:', error.response.status);
+      }
       return false;
     } finally {
       setIsLoading(false);
@@ -145,14 +117,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const sendOTP = async (phone: string): Promise<boolean> => {
     try {
-      // Mock API call - replace with actual backend call
-      const response = await fetch('/api/admin/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone }),
-      });
-
-      return response.ok;
+      const response = await authAPI.sendOTP(phone);
+      return response.data.success;
     } catch (error) {
       console.error('Send OTP error:', error);
       return false;

@@ -184,8 +184,8 @@ export default function HeaderWithAuth() {
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
           {/* Left: Logo */}
           <a href="/" className="flex items-center space-x-2">
-            <img src="/logo.png" alt="Bidorai Logo" className="w-9 h-9" />
-            <span className="font-bold text-2xl text-blue-700">Bidorai</span>
+            <img src="/logo.png" alt="Bidovio Logo" className="w-9 h-9" />
+            <span className="font-bold text-2xl text-blue-700">Bidovio</span>
           </a>
           {/* Center: Search Bar */}
           <div className="flex-1 flex justify-center">
@@ -219,8 +219,8 @@ export default function HeaderWithAuth() {
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
           {/* Left: Logo */}
           <a href="/" className="flex items-center space-x-2">
-            <img src="/logo.png" alt="Bidorai Logo" className="w-9 h-9" />
-            <span className="font-bold text-2xl text-blue-700">Bidorai</span>
+            <img src="/logo.png" alt="Bidovio Logo" className="w-9 h-9" />
+            <span className="font-bold text-2xl text-blue-700">Bidovio</span>
           </a>
           {/* Center: Search Bar */}
           <div className="flex-1 flex justify-center">
