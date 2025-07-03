@@ -1,3 +1,3 @@
 # config
 
-Configuration files (DB, Redis, etc) for Bidorai backend. 
+Configuration files (DB, Redis, etc) for Bidovio backend. 

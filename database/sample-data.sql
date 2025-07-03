@@ -1,4 +1,4 @@
--- Sample data for Bidorai customer portal
+-- Sample data for Bidovio customer portal
 -- This will populate the database with realistic data for testing all features
 
 -- Clear existing data (optional - uncomment if you want to start fresh)
@@ -17,7 +17,7 @@ INSERT INTO users (email, password_hash, role) VALUES
 ('restaurant1@example.com', '$2a$10$example.hash.restaurant1', 'restaurant'),
 ('restaurant2@example.com', '$2a$10$example.hash.restaurant2', 'restaurant'),
 ('restaurant3@example.com', '$2a$10$example.hash.restaurant3', 'restaurant'),
-('admin@bidorai.com', '$2a$10$example.hash.admin', 'admin'),
+('admin@bidovio.com', '$2a$10$example.hash.admin', 'admin'),
 ('delivery1@example.com', '$2a$10$example.hash.delivery1', 'delivery')
 ON CONFLICT (email) DO NOTHING;
 

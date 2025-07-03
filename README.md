@@ -1,4 +1,4 @@
-# Bidorai Platform
+# Bidovio Platform
 
 A real-time party tray catering platform with live bidding, inspired by ezCater.com.
 
@@ -9,7 +9,7 @@ A real-time party tray catering platform with live bidding, inspired by ezCater.
 
 ## Monorepo Structure
 ```
-Bidorai-Platform/
+Bidovio-Platform/
   backend/      # Express API
   frontend/     # Next.js apps (customer, restaurant, admin)
   database/     # SQL schema/init scripts

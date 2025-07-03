@@ -18,6 +18,7 @@ import { registerOrderSocket } from './socket/orderSocket';
 import restaurantAnalyticsRouter from './routes/restaurant-analytics';
 import adminAnalyticsRouter from './routes/admin-analytics';
 import notificationsHistoryRouter from './routes/notifications-history';
+import adminAuthRouter from './routes/admin-auth';
 
 // Load env vars
 dotenv.config();
@@ -62,6 +63,7 @@ io.on('connection', (socket) => {
 app.use('/auth', authRouter);
 app.use('/menu', menuRouter);
 app.use('/order', orderRouter);
+app.use('/admin', adminAuthRouter);
 app.use('/admin', adminRouter);
 app.use('/notifications', notificationsRouter);
 app.use('/restaurant', restaurantRouter);

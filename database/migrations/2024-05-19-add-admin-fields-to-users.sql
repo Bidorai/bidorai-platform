@@ -1,0 +1,5 @@
+ALTER TABLE users
+  ADD COLUMN name VARCHAR(255),
+  ADD COLUMN phone VARCHAR(30),
+  ADD COLUMN permissions TEXT[],
+  ADD COLUMN last_login TIMESTAMP; 

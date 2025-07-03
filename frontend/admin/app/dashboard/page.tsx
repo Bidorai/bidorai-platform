@@ -145,7 +145,7 @@ export default function DashboardPage() {
               Welcome back, {user?.name || 'Admin'}!
             </h1>
             <p className="mt-1 text-sm text-gray-600">
-              Here's what's happening on the Bidorai platform today.
+              Here's what's happening on the Bidovio platform today.
             </p>
           </div>
 

@@ -1,3 +1,3 @@
 # utils
 
-Utility/helper functions for Bidorai backend. 
+Utility/helper functions for Bidovio backend. 

@@ -11,7 +11,7 @@ export default function PrivacyPage() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Introduction</h2>
               <p className="text-gray-700 mb-4">
-                Bidorai ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, 
+                Bidovio ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, 
                 use, disclose, and safeguard your information when you use our competitive bidding platform for party food orders.
               </p>
             </section>
@@ -185,20 +185,11 @@ export default function PrivacyPage() {
               <p className="text-gray-700 mb-4">
                 If you have any questions about this Privacy Policy or our privacy practices, please contact us:
               </p>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-gray-700">Bidorai Inc.</p>
-                <p className="text-gray-700">Email: privacy@bidorai.com</p>
-                <p className="text-gray-700">Phone: 1-800-BIDORAI</p>
-                <p className="text-gray-700">Address: San Francisco, CA</p>
+              <div className="bg-gray-50 p-6 rounded-lg">
+                <p className="text-gray-700">Bidovio Inc.</p>
+                <p className="text-gray-700">Email: privacy@bidovio.com</p>
+                <p className="text-gray-700">Phone: 1-800-BIDOVIO</p>
               </div>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">13. California Privacy Rights</h2>
-              <p className="text-gray-700 mb-4">
-                California residents have additional rights under the California Consumer Privacy Act (CCPA). 
-                For more information about your California privacy rights, please contact us.
-              </p>
             </section>
           </div>
         </div>

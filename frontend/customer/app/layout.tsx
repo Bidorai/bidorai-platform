@@ -9,7 +9,7 @@ import ConditionalHeader from '../components/ConditionalHeader'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Bidorai - Customer Portal',
+      title: 'Bidovio - Customer Portal',
   description: 'Order party trays from the best restaurants with competitive bidding',
 }
 
@@ -35,7 +35,7 @@ export default function RootLayout({
                 <div className="text-center mb-8">
                   <div className="flex items-center justify-center gap-2 mb-4">
                     <img src="/logo.png" alt="Bidorai" className="w-8 h-8" />
-                    <span className="font-bold text-2xl">Bidorai</span>
+                    <span className="font-bold text-2xl">Bidovio</span>
                   </div>
                   <p className="text-gray-400 max-w-2xl mx-auto mb-8">
                     Connecting communities with premium fresh food through innovative bidding technology and restaurant partnerships.
@@ -44,7 +44,7 @@ export default function RootLayout({
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
                   <div>
-                    <h3 className="font-semibold mb-4 text-yellow-400">⭐ BIDORAI</h3>
+                    <h3 className="font-semibold mb-4 text-yellow-400">⭐ BIDOVIO</h3>
                     <ul className="space-y-2 text-gray-400">
                       <li><a href="/about" target="_blank" rel="noopener noreferrer" className="hover:text-white">About Us</a></li>
                       <li><a href="/careers" target="_blank" rel="noopener noreferrer" className="hover:text-white">Careers</a></li>
@@ -79,7 +79,7 @@ export default function RootLayout({
                       <li><a href="/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-white">Privacy Policy</a></li>
                       <li><a href="/faq" target="_blank" rel="noopener noreferrer" className="hover:text-white">Cookie Policy</a></li>
                     </ul>
-                    <p className="mt-4 text-orange-400 font-semibold">📞 1-800-BIDORAI</p>
+                    <p className="mt-4 text-orange-400 font-semibold">📞 1-800-BIDOVIO</p>
                   </div>
                 </div>
                 
@@ -91,7 +91,7 @@ export default function RootLayout({
                       <span className="flex items-center gap-2">❤️ Local Partners</span>
                     </div>
                     <p className="text-gray-400 text-sm">
-                      © 2025 BIDORAI. Making party catering affordable and accessible.
+                      © 2025 BIDOVIO. Making party catering affordable and accessible.
                     </p>
                   </div>
                 </div>

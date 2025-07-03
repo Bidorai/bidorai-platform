@@ -139,29 +139,32 @@ export function AddressAutocomplete({
     );
   };
 
-  // Simple input with location button (fallback when Google Maps is not available)
   return (
     <div className="relative">
-      <input
-        ref={inputRef}
-        type="text"
-        value={value}
-        onChange={(e) => {
-          setValue(e.target.value);
-          // Simulate location selection with default coordinates when user types
-          if (e.target.value.trim()) {
-            onLocationSelect({
-              address: e.target.value,
-              lat: 32.7767, // Dallas coordinates as fallback
-              lng: -96.7970,
-              placeId: 'manual-input'
-            });
-          }
-        }}
-        placeholder={placeholder}
-        className={`w-full px-4 py-3 pr-32 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
-      />
-      
+      <StandaloneSearchBox
+        onLoad={onLoad}
+        onPlacesChanged={onPlacesChanged}
+      >
+        <input
+          ref={inputRef}
+          type="text"
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value);
+            // Simulate location selection with default coordinates when user types
+            if (e.target.value.trim()) {
+              onLocationSelect({
+                address: e.target.value,
+                lat: 32.7767, // Dallas coordinates as fallback
+                lng: -96.7970,
+                placeId: 'manual-input'
+              });
+            }
+          }}
+          placeholder={placeholder}
+          className={`w-full px-4 py-3 pr-32 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
+        />
+      </StandaloneSearchBox>
       {/* Use My Location Button */}
       <button
         onClick={handleUseMyLocation}

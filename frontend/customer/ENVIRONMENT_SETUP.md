@@ -1,4 +1,4 @@
-# Environment Setup for Bidorai Customer Portal
+# Environment Setup for Bidovio Customer Portal
 
 ## Required Environment Variables
 

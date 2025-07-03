@@ -1,3 +1,3 @@
 # models
 
-Database models for Bidorai backend. 
+Database models for Bidovio backend. 

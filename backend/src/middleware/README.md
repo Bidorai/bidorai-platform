@@ -1,3 +1,3 @@
 # middleware
 
-Express middleware for Bidorai backend. 
+Express middleware for Bidovio backend. 
