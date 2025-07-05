@@ -13,17 +13,21 @@ interface AddressAutocompleteProps {
   placeholder?: string;
   defaultValue?: string;
   className?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export function AddressAutocomplete({ 
   onLocationSelect, 
   placeholder = "Enter your location",
   defaultValue = "",
-  className = ""
+  className = "",
+  value,
+  onChange
 }: AddressAutocompleteProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const searchBoxRef = useRef<google.maps.places.SearchBox | null>(null);
-  const [value, setValue] = useState(defaultValue);
+  const [valueState, setValue] = useState(defaultValue);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [googleMapsError, setGoogleMapsError] = useState(false);
 
@@ -43,7 +47,11 @@ export function AddressAutocomplete({
             lng: place.geometry.location.lng(),
             placeId: place.place_id || ''
           };
-          setValue(location.address);
+          if (onChange) {
+            onChange({ target: { value: location.address } } as React.ChangeEvent<HTMLInputElement>);
+          } else {
+            setValue(location.address);
+          }
           onLocationSelect(location);
         }
       }
@@ -61,29 +69,27 @@ export function AddressAutocomplete({
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
-        
         try {
-          // Check if Google Maps is available
           if (typeof google === 'undefined' || !google.maps || !google.maps.Geocoder) {
-            // Fallback: use coordinates as address
             const location = {
               address: `Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`,
               lat: latitude,
               lng: longitude,
               placeId: 'manual-location'
             };
-            setValue(location.address);
+            if (onChange) {
+              onChange({ target: { value: location.address } } as React.ChangeEvent<HTMLInputElement>);
+            } else {
+              setValue(location.address);
+            }
             onLocationSelect(location);
             setIsLoadingLocation(false);
             return;
           }
-
-          // Use Google Geocoding API to get address from coordinates
           const geocoder = new google.maps.Geocoder();
           const result = await geocoder.geocode({
             location: { lat: latitude, lng: longitude }
           });
-
           if (result.results && result.results.length > 0) {
             const place = result.results[0];
             const location = {
@@ -92,21 +98,28 @@ export function AddressAutocomplete({
               lng: longitude,
               placeId: place.place_id || ''
             };
-            setValue(location.address);
+            if (onChange) {
+              onChange({ target: { value: location.address } } as React.ChangeEvent<HTMLInputElement>);
+            } else {
+              setValue(location.address);
+            }
             onLocationSelect(location);
           } else {
             alert('Could not find address for your location.');
           }
         } catch (error) {
           console.error('Geocoding error:', error);
-          // Fallback: use coordinates as address
           const location = {
             address: `Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`,
             lat: latitude,
             lng: longitude,
             placeId: 'manual-location'
           };
-          setValue(location.address);
+          if (onChange) {
+            onChange({ target: { value: location.address } } as React.ChangeEvent<HTMLInputElement>);
+          } else {
+            setValue(location.address);
+          }
           onLocationSelect(location);
         } finally {
           setIsLoadingLocation(false);
@@ -115,7 +128,6 @@ export function AddressAutocomplete({
       (error) => {
         console.error('Geolocation error:', error);
         let errorMessage = 'Error getting your location.';
-        
         switch (error.code) {
           case error.PERMISSION_DENIED:
             errorMessage = 'Location access denied. Please enable location services.';
@@ -127,7 +139,6 @@ export function AddressAutocomplete({
             errorMessage = 'Location request timed out.';
             break;
         }
-        
         alert(errorMessage);
         setIsLoadingLocation(false);
       },
@@ -148,38 +159,26 @@ export function AddressAutocomplete({
         <input
           ref={inputRef}
           type="text"
-          value={value}
-          onChange={(e) => {
-            setValue(e.target.value);
-            // Simulate location selection with default coordinates when user types
-            if (e.target.value.trim()) {
-              onLocationSelect({
-                address: e.target.value,
-                lat: 32.7767, // Dallas coordinates as fallback
-                lng: -96.7970,
-                placeId: 'manual-input'
-              });
+          value={typeof value === 'string' ? value : valueState}
+          onChange={e => {
+            if (onChange) {
+              onChange(e);
+            } else {
+              setValue(e.target.value);
+              if (e.target.value.trim()) {
+                onLocationSelect({
+                  address: e.target.value,
+                  lat: 32.7767,
+                  lng: -96.7970,
+                  placeId: 'manual-input'
+                });
+              }
             }
           }}
           placeholder={placeholder}
           className={`w-full px-4 py-3 pr-32 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
         />
       </StandaloneSearchBox>
-      {/* Use My Location Button */}
-      <button
-        onClick={handleUseMyLocation}
-        disabled={isLoadingLocation}
-        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
-      >
-        {isLoadingLocation ? (
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin"></div>
-            <span>Loading...</span>
-          </div>
-        ) : (
-          <span>📍 Use My Location</span>
-        )}
-      </button>
     </div>
   );
 } 

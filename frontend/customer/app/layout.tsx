@@ -5,6 +5,8 @@ import { SearchBar } from '../components/SearchBar'
 import { GoogleMapsProvider } from '../providers/GoogleMapsProvider'
 import { ClerkProvider } from '@clerk/nextjs'
 import ConditionalHeader from '../components/ConditionalHeader'
+import { CartProvider } from '../contexts/CartContext'
+import { Cart } from '../components/Cart'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -26,10 +28,13 @@ export default function RootLayout({
       <body className={inter.className}>
         <ClerkProvider>
           <GoogleMapsProvider>
-            <ConditionalHeader />
-            <div className="min-h-screen bg-gray-50">
-              {children}
-            </div>
+            <CartProvider>
+              <ConditionalHeader />
+              <div className="min-h-screen bg-gray-50">
+                {children}
+              </div>
+              <Cart />
+            </CartProvider>
             <footer className="bg-gray-900 text-white pt-16 pb-16">
               <div className="max-w-7xl mx-auto px-6">
                 <div className="text-center mb-8">

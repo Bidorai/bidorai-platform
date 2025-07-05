@@ -1,9 +1,11 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
   "/about/page": "app/about/page.js",
+  "/api/search/restaurants/route": "app/api/search/restaurants/route.js",
   "/auth/page": "app/auth/page.js",
   "/bids/page": "app/bids/page.js",
   "/careers/page": "app/careers/page.js",
+  "/checkout/page": "app/checkout/page.js",
   "/contact/page": "app/contact/page.js",
   "/dashboard/page": "app/dashboard/page.js",
   "/debug/page": "app/debug/page.js",
@@ -27,8 +29,8 @@
   "/restaurantowners/bidding/page": "app/restaurantowners/bidding/page.js",
   "/restaurantowners/dashboard/page": "app/restaurantowners/dashboard/page.js",
   "/restaurantowners/menu/page": "app/restaurantowners/menu/page.js",
-  "/restaurantowners/notifications/page": "app/restaurantowners/notifications/page.js",
   "/restaurantowners/onboarding/page": "app/restaurantowners/onboarding/page.js",
+  "/restaurantowners/notifications/page": "app/restaurantowners/notifications/page.js",
   "/restaurantowners/orders/page": "app/restaurantowners/orders/page.js",
   "/restaurantowners/page": "app/restaurantowners/page.js",
   "/restaurantowners/profile/page": "app/restaurantowners/profile/page.js"
