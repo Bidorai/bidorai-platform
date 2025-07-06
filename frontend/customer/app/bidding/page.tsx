@@ -1,79 +1,151 @@
 "use client";
 export const dynamic = "force-dynamic";
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { io, Socket } from "socket.io-client";
 import Link from "next/link";
+import { useUser } from '@clerk/nextjs';
+import { MapPinIcon, ClockIcon, UsersIcon, StarIcon, TruckIcon } from '@heroicons/react/24/outline';
 
-interface Menu {
+interface Restaurant {
+  id: number;
+  name: string;
+  rating: number;
+  distance: string;
+  cuisine: string;
+  image: string;
+  isOpen: boolean;
+}
+
+interface PartyTray {
   id: number;
   name: string;
   description: string;
-  price: number;
-  restaurant_name: string;
+  serves: number;
+  originalPrice: number;
+  currentBid: number;
+  minBid: number;
+  restaurantId: number;
+  restaurantName: string;
+  image: string;
+  timeRemaining: number;
+  biddersCount: number;
+  tags: string[];
 }
 
 interface Bid {
   id: number;
   userId: number;
+  userName: string;
   amount: number;
   timestamp: string;
-  userName?: string;
+  trayId: number;
 }
 
 const SOCKET_URL = "http://localhost:4000";
 
+// Mock data for demonstration
+const mockRestaurants: Restaurant[] = [
+  {
+    id: 1,
+    name: "Farm Fresh Kitchen",
+    rating: 4.9,
+    distance: "0.8 km",
+    cuisine: "Organic & Healthy",
+    image: "/api/placeholder/150/150",
+    isOpen: true
+  },
+  {
+    id: 2,
+    name: "Green Garden Bistro",
+    rating: 4.8,
+    distance: "1.2 km",
+    cuisine: "Farm-to-Table",
+    image: "/api/placeholder/150/150",
+    isOpen: true
+  },
+  {
+    id: 3,
+    name: "Tokyo Sushi",
+    rating: 4.7,
+    distance: "2.1 km",
+    cuisine: "Japanese",
+    image: "/api/placeholder/150/150",
+    isOpen: true
+  }
+];
+
+const mockPartyTrays: PartyTray[] = [
+  {
+    id: 1,
+    name: "Organic Harvest Bowl",
+    description: "Fresh organic vegetables, quinoa, and grilled chicken. Perfect for health-conscious gatherings.",
+    serves: 15,
+    originalPrice: 285,
+    currentBid: 217,
+    minBid: 220,
+    restaurantId: 1,
+    restaurantName: "Farm Fresh Kitchen",
+    image: "/api/placeholder/200/150",
+    timeRemaining: 156, // seconds
+    biddersCount: 8,
+    tags: ["Organic", "Gluten-Free", "Vegan Option"]
+  },
+  {
+    id: 2,
+    name: "Sustainable Feast Tray",
+    description: "Locally sourced ingredients featuring seasonal vegetables and free-range chicken.",
+    serves: 12,
+    originalPrice: 220,
+    currentBid: 185,
+    minBid: 190,
+    restaurantId: 2,
+    restaurantName: "Green Garden Bistro",
+    image: "/api/placeholder/200/150",
+    timeRemaining: 89,
+    biddersCount: 12,
+    tags: ["Farm-to-Table", "Seasonal", "Local"]
+  },
+  {
+    id: 3,
+    name: "Party Sushi Platter",
+    description: "Assorted sushi rolls, sashimi, and nigiri. Fresh fish delivered daily.",
+    serves: 10,
+    originalPrice: 195,
+    currentBid: 165,
+    minBid: 170,
+    restaurantId: 3,
+    restaurantName: "Tokyo Sushi",
+    image: "/api/placeholder/200/150",
+    timeRemaining: 234,
+    biddersCount: 5,
+    tags: ["Fresh Fish", "Premium", "Chef's Selection"]
+  }
+];
+
 export default function BiddingPage() {
+  const { isSignedIn, user } = useUser();
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [amount, setAmount] = useState("");
+  const [selectedTray, setSelectedTray] = useState<PartyTray | null>(null);
+  const [bidAmount, setBidAmount] = useState("");
   const [bids, setBids] = useState<Bid[]>([]);
-  const [winner, setWinner] = useState<any>(null);
-  const [isActive, setIsActive] = useState(false);
-  const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
-  const [menus, setMenus] = useState<Menu[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [restaurants] = useState<Restaurant[]>(mockRestaurants);
+  const [partyTrays, setPartyTrays] = useState<PartyTray[]>(mockPartyTrays);
+  const [activeTab, setActiveTab] = useState<'live' | 'upcoming'>('live');
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [roundId, setRoundId] = useState("");
+  const [success, setSuccess] = useState("");
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    if (!isSignedIn) {
       router.push('/auth');
       return;
     }
 
-    fetchMenus();
     initializeSocket();
-  }, [router]);
-
-  useEffect(() => {
-    const menuId = searchParams.get('menuId');
-    if (menuId && menus.length > 0) {
-      const menu = menus.find(m => m.id === parseInt(menuId));
-      if (menu) {
-        setSelectedMenu(menu);
-        setRoundId(`round-${menu.id}-${Date.now()}`);
-      }
-    }
-  }, [searchParams, menus]);
-
-  const fetchMenus = async () => {
-    try {
-      const response = await fetch("http://localhost:4000/menu");
-      if (response.ok) {
-        const data = await response.json();
-        setMenus(data);
-      } else {
-        setError("Failed to load menus");
-      }
-    } catch (err) {
-      setError("Network error. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    startTimeUpdates();
+  }, [isSignedIn, router]);
 
   const initializeSocket = () => {
     const s = io(SOCKET_URL);
@@ -83,18 +155,20 @@ export default function BiddingPage() {
       console.log("Connected to bidding socket");
     });
 
-    s.on("biddingRoundState", (round) => {
-      setBids(round.bids || []);
-      setIsActive(round.isActive);
-    });
-
-    s.on("biddingRoundEnded", ({ winner }) => {
-      setWinner(winner);
-      setIsActive(false);
-    });
-
-    s.on("newBid", (bid) => {
+    s.on("newBid", (bid: Bid) => {
       setBids(prev => [...prev, bid]);
+      // Update the current bid for the tray
+      if (selectedTray && bid.trayId === selectedTray.id) {
+        setSelectedTray(prev => prev ? { ...prev, currentBid: bid.amount } : null);
+      }
+    });
+
+    s.on("biddingRoundEnded", ({ winner, trayId }) => {
+      setSuccess(`🎉 Bidding ended! Winner: ${winner.userName} with $${winner.amount}`);
+      // Update the tray to show it's ended
+      setPartyTrays(prev => prev.map(tray => 
+        tray.id === trayId ? { ...tray, timeRemaining: 0 } : tray
+      ));
     });
 
     return () => {
@@ -102,55 +176,78 @@ export default function BiddingPage() {
     };
   };
 
+  const startTimeUpdates = () => {
+    const interval = setInterval(() => {
+      setPartyTrays(prev => prev.map(tray => ({
+        ...tray,
+        timeRemaining: Math.max(0, tray.timeRemaining - 1)
+      })));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  };
+
   const handleBid = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!socket || !selectedMenu || !amount) return;
+    if (!socket || !selectedTray || !bidAmount) return;
 
-    const bidAmount = parseFloat(amount);
-    if (bidAmount <= 0) {
-      setError("Bid amount must be greater than 0");
+    const amount = parseFloat(bidAmount);
+    if (amount < selectedTray.minBid) {
+      setError(`Minimum bid is $${selectedTray.minBid}`);
       return;
     }
 
-    socket.emit("placeBid", { 
-      roundId, 
-      userId: 1, // In real app, get from JWT
-      amount: bidAmount,
-      menuId: selectedMenu.id
-    });
-    setAmount("");
+    setIsLoading(true);
     setError("");
+
+    // Simulate bid placement
+    setTimeout(() => {
+      const newBid: Bid = {
+        id: Date.now(),
+        userId: typeof user?.id === 'string' ? parseInt(user.id) : (user?.id || 1),
+        userName: user?.firstName || 'Anonymous',
+        amount: amount,
+        timestamp: new Date().toISOString(),
+        trayId: selectedTray.id
+      };
+
+      setBids(prev => [...prev, newBid]);
+      setSelectedTray(prev => prev ? { ...prev, currentBid: amount, biddersCount: prev.biddersCount + 1 } : null);
+      setBidAmount("");
+      setSuccess("Bid placed successfully!");
+      setIsLoading(false);
+
+      // Emit to socket
+      socket.emit("placeBid", {
+        trayId: selectedTray.id,
+        userId: typeof user?.id === 'string' ? parseInt(user.id) : (user?.id || 1),
+        amount: amount
+      });
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(""), 3000);
+    }, 500);
   };
 
-  const handleStartRound = () => {
-    if (!socket || !selectedMenu) return;
-    
-    const newRoundId = `round-${selectedMenu.id}-${Date.now()}`;
-    setRoundId(newRoundId);
-    setWinner(null);
-    setBids([]);
-    
-    socket.emit("startBiddingRound", { 
-      roundId: newRoundId, 
-      menuId: selectedMenu.id, 
-      restaurantId: 1 
-    });
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleMenuSelect = (menu: Menu) => {
-    setSelectedMenu(menu);
-    setRoundId(`round-${menu.id}-${Date.now()}`);
-    setWinner(null);
-    setBids([]);
-    setIsActive(false);
+  const handleTraySelect = (tray: PartyTray) => {
+    setSelectedTray(tray);
+    setBids([]); // Clear previous bids
+    setError("");
+    setSuccess("");
   };
 
-  if (isLoading) {
+  if (!isSignedIn) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading bidding interface...</p>
+          <p className="mt-4 text-gray-600">Redirecting to sign in...</p>
         </div>
       </div>
     );
@@ -158,161 +255,273 @@ export default function BiddingPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Live Party Tray Bidding</h1>
+          <p className="text-xl text-gray-600">Bid on delicious party trays and save up to 30% off retail prices</p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
-              <Link href="/" className="text-2xl font-bold text-blue-600">
-                Bidovio
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/dashboard" className="text-blue-600 hover:text-blue-800">
-                Dashboard
-              </Link>
-              <Link href="/menu" className="text-blue-600 hover:text-blue-800">
-                Browse Menus
-              </Link>
-              <Link href="/orders" className="text-blue-600 hover:text-blue-800">
-                My Orders
-              </Link>
-              <button
-                onClick={() => {
-                  localStorage.removeItem('token');
-                  router.push('/');
-                }}
-                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
-              >
-                Logout
-              </button>
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <ClockIcon className="w-6 h-6 text-blue-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Active Bids</p>
+                <p className="text-2xl font-bold text-gray-900">{partyTrays.filter(t => t.timeRemaining > 0).length}</p>
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Live Bidding</h1>
-          <p className="text-gray-600">Place bids on party trays and get the best prices</p>
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <UsersIcon className="w-6 h-6 text-green-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Total Bidders</p>
+                <p className="text-2xl font-bold text-gray-900">{partyTrays.reduce((sum, tray) => sum + tray.biddersCount, 0)}</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <StarIcon className="w-6 h-6 text-orange-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Avg. Savings</p>
+                <p className="text-2xl font-bold text-gray-900">18%</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <TruckIcon className="w-6 h-6 text-purple-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Restaurants</p>
+                <p className="text-2xl font-bold text-gray-900">{restaurants.length}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Menu Selection */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Select Menu</h2>
-              {menus.length === 0 ? (
-                <p className="text-gray-600">No menus available</p>
-              ) : (
-                <div className="space-y-3">
-                  {menus.map((menu) => (
-                    <button
-                      key={menu.id}
-                      onClick={() => handleMenuSelect(menu)}
-                      className={`w-full text-left p-4 rounded-lg border transition-colors ${
-                        selectedMenu?.id === menu.id
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <h3 className="font-semibold text-gray-900">{menu.name}</h3>
-                      <p className="text-sm text-gray-600">{menu.restaurant_name}</p>
-                      <p className="text-sm text-gray-500">${menu.price}</p>
-                    </button>
-                  ))}
-                </div>
-              )}
+          {/* Left Column - Available Trays */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg shadow">
+              {/* Tabs */}
+              <div className="border-b border-gray-200">
+                <nav className="-mb-px flex space-x-8 px-6">
+                  <button
+                    onClick={() => setActiveTab('live')}
+                    className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === 'live'
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    Live Bidding ({partyTrays.filter(t => t.timeRemaining > 0).length})
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('upcoming')}
+                    className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === 'upcoming'
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    Upcoming (0)
+                  </button>
+                </nav>
+              </div>
+
+              {/* Trays List */}
+              <div className="p-6">
+                {activeTab === 'live' && (
+                  <div className="space-y-6">
+                    {partyTrays.filter(tray => tray.timeRemaining > 0).map((tray) => (
+                      <div
+                        key={tray.id}
+                        onClick={() => handleTraySelect(tray)}
+                        className={`border-2 rounded-lg p-6 cursor-pointer transition-all hover:shadow-lg ${
+                          selectedTray?.id === tray.id
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <h3 className="text-xl font-bold text-gray-900">{tray.name}</h3>
+                              <div className="flex items-center space-x-2">
+                                <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                  {formatTime(tray.timeRemaining)}
+                                </span>
+                                <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded-full">
+                                  {tray.biddersCount} bidders
+                                </span>
+                              </div>
+                            </div>
+                            <p className="text-gray-600 mb-3">{tray.description}</p>
+                            <div className="flex items-center space-x-4 text-sm text-gray-500 mb-3">
+                              <span className="flex items-center">
+                                <MapPinIcon className="w-4 h-4 mr-1" />
+                                {tray.restaurantName}
+                              </span>
+                              <span>•</span>
+                              <span>Serves {tray.serves} people</span>
+                              <span>•</span>
+                              <span className="flex items-center">
+                                <StarIcon className="w-4 h-4 mr-1" />
+                                4.8
+                              </span>
+                            </div>
+                            <div className="flex items-center space-x-2 mb-3">
+                              {tray.tags.map((tag, index) => (
+                                <span
+                                  key={index}
+                                  className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-4">
+                                <div>
+                                  <p className="text-sm text-gray-500">Original Price</p>
+                                  <p className="text-lg font-bold text-gray-400 line-through">${tray.originalPrice}</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-500">Current Bid</p>
+                                  <p className="text-2xl font-bold text-blue-600">${tray.currentBid}</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-500">Min. Next Bid</p>
+                                  <p className="text-lg font-bold text-green-600">${tray.minBid}</p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm text-gray-500">You Save</p>
+                                <p className="text-lg font-bold text-green-600">
+                                  ${tray.originalPrice - tray.currentBid}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {activeTab === 'upcoming' && (
+                  <div className="text-center py-12">
+                    <div className="text-gray-400 text-6xl mb-4">📅</div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No Upcoming Bids</h3>
+                    <p className="text-gray-600">Check back later for new party tray auctions</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Bidding Interface */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow p-6">
-              {!selectedMenu ? (
+          {/* Right Column - Bidding Interface */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow p-6 sticky top-8">
+              {!selectedTray ? (
                 <div className="text-center py-12">
-                  <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Select a Menu</h3>
-                  <p className="text-gray-600">Choose a menu from the left to start bidding</p>
+                  <div className="text-gray-400 text-6xl mb-4">🎯</div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Select a Party Tray</h3>
+                  <p className="text-gray-600">Choose a tray from the left to start bidding</p>
                 </div>
               ) : (
                 <>
-                  {/* Selected Menu Info */}
-                  <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-2">{selectedMenu.name}</h2>
-                    <p className="text-gray-600 mb-2">{selectedMenu.description}</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-500">{selectedMenu.restaurant_name}</span>
-                      <span className="text-lg font-bold text-blue-600">${selectedMenu.price}</span>
-                    </div>
-                  </div>
-
-                  {/* Bidding Controls */}
+                  {/* Selected Tray Info */}
                   <div className="mb-6">
-                    <button
-                      className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={handleStartRound}
-                      disabled={isActive}
-                    >
-                      {isActive ? "Bidding Active" : "Start Bidding Round"}
-                    </button>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{selectedTray.name}</h3>
+                    <p className="text-gray-600 mb-4">{selectedTray.description}</p>
+                    <div className="bg-blue-50 rounded-lg p-4 mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-700">Time Remaining</span>
+                        <span className="text-lg font-bold text-red-600">{formatTime(selectedTray.timeRemaining)}</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-red-500 h-2 rounded-full transition-all duration-1000"
+                          style={{
+                            width: `${Math.max(0, (selectedTray.timeRemaining / 300) * 100)}%`
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div className="text-center">
+                        <p className="text-sm text-gray-500">Current Bid</p>
+                        <p className="text-2xl font-bold text-blue-600">${selectedTray.currentBid}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-gray-500">Min. Next Bid</p>
+                        <p className="text-xl font-bold text-green-600">${selectedTray.minBid}</p>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Bid Form */}
                   <form onSubmit={handleBid} className="mb-6">
-                    <div className="flex gap-4">
-                      <div className="flex-1">
-                        <label htmlFor="bid-amount" className="block text-sm font-medium text-gray-700 mb-2">
-                          Your Bid Amount ($)
-                        </label>
-                        <input
-                          type="number"
-                          id="bid-amount"
-                          step="0.01"
-                          min="0"
-                          placeholder="Enter your bid"
-                          value={amount}
-                          onChange={(e) => setAmount(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          disabled={!isActive}
-                        />
-                      </div>
-                      <div className="flex items-end">
-                        <button
-                          type="submit"
-                          className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                          disabled={!isActive || !amount}
-                        >
-                          Place Bid
-                        </button>
-                      </div>
+                    <div className="mb-4">
+                      <label htmlFor="bid-amount" className="block text-sm font-medium text-gray-700 mb-2">
+                        Your Bid Amount ($)
+                      </label>
+                      <input
+                        type="number"
+                        id="bid-amount"
+                        step="0.01"
+                        min={selectedTray.minBid}
+                        placeholder={`Min. $${selectedTray.minBid}`}
+                        value={bidAmount}
+                        onChange={(e) => setBidAmount(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        disabled={selectedTray.timeRemaining === 0}
+                      />
                     </div>
+                    <button
+                      type="submit"
+                      disabled={!bidAmount || parseFloat(bidAmount) < selectedTray.minBid || selectedTray.timeRemaining === 0 || isLoading}
+                      className="w-full bg-blue-600 text-white py-3 px-4 rounded-md font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      {isLoading ? "Placing Bid..." : "Place Bid"}
+                    </button>
                   </form>
 
-                  {/* Error Message */}
+                  {/* Messages */}
                   {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6">
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4">
                       {error}
+                    </div>
+                  )}
+                  {success && (
+                    <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md mb-4">
+                      {success}
                     </div>
                   )}
 
                   {/* Live Bids */}
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Live Bids</h3>
-                    <div className="bg-gray-50 rounded-lg p-4 min-h-[200px] max-h-[300px] overflow-y-auto">
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-3">Recent Bids</h4>
+                    <div className="bg-gray-50 rounded-lg p-4 max-h-64 overflow-y-auto">
                       {bids.length === 0 ? (
-                        <p className="text-gray-500 text-center py-8">
-                          {isActive ? "No bids yet. Be the first to bid!" : "Bidding not started"}
-                        </p>
+                        <p className="text-gray-500 text-center py-4">No bids yet. Be the first to bid!</p>
                       ) : (
                         <div className="space-y-2">
-                          {bids.map((bid, index) => (
-                            <div key={index} className="flex justify-between items-center p-2 bg-white rounded">
+                          {bids.slice(-5).reverse().map((bid, index) => (
+                            <div key={bid.id} className="flex justify-between items-center p-2 bg-white rounded">
                               <span className="text-sm text-gray-600">
-                                User {bid.userId} {bid.userName && `(${bid.userName})`}
+                                {bid.userName}
                               </span>
                               <span className="font-semibold text-green-600">${bid.amount}</span>
                             </div>
@@ -321,14 +530,6 @@ export default function BiddingPage() {
                       )}
                     </div>
                   </div>
-
-                  {/* Winner Announcement */}
-                  {winner && (
-                    <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md">
-                      <h3 className="font-semibold mb-1">🎉 Bidding Round Complete!</h3>
-                      <p>Winner: User {winner.userId} with ${winner.amount}</p>
-                    </div>
-                  )}
                 </>
               )}
             </div>

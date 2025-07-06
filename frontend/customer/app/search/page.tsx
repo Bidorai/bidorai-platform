@@ -23,7 +23,8 @@ import {
   CurrencyDollarIcon
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarSolid } from '@heroicons/react/24/solid';
-import { LocationModal, PartySizeModal, MapView, EmptyState } from '@/components/search';
+import { MapView, EmptyState } from '@/components/search';
+import { useSearch } from '../../contexts/SearchContext';
 
 interface Restaurant {
   id: string;
@@ -76,13 +77,13 @@ interface FilterState {
 export default function SearchPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { viewMode, setViewMode }: { viewMode: 'list' | 'map'; setViewMode: (mode: 'list' | 'map') => void } = useSearch();
   const query = searchParams.get('q') || '';
   const location = searchParams.get('location') || 'Dallas, TX';
   const partySize = parseInt(searchParams.get('partySize') || '15');
   
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [showFilters, setShowFilters] = useState(true);
   const [expandedRestaurant, setExpandedRestaurant] = useState<string | null>(null);
   const [selectedDeliveryDate, setSelectedDeliveryDate] = useState('');
@@ -229,36 +230,20 @@ export default function SearchPage() {
     router.push(`/search?${params.toString()}`);
   };
 
-  const handleLocationSelect = (newLocation: string) => {
-    const params = new URLSearchParams();
-    if (query) params.append('q', query);
-    params.append('location', newLocation);
-    if (partySize) params.append('partySize', partySize.toString());
-    router.push(`/search?${params.toString()}`);
-  };
-
-  const handlePartySizeSelect = (newSize: number) => {
-    const params = new URLSearchParams();
-    if (query) params.append('q', query);
-    if (location) params.append('location', location);
-    params.append('partySize', newSize.toString());
-    router.push(`/search?${params.toString()}`);
-  };
-
   const formatTimeRemaining = (endTime: string) => {
-    const now = new Date().getTime();
-    const end = new Date(endTime).getTime();
-    const diff = end - now;
-
+    const now = new Date();
+    const end = new Date(endTime);
+    const diff = end.getTime() - now.getTime();
+    
     if (diff <= 0) return 'Ended';
-
+    
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
+    
     if (hours > 0) {
-      return `${hours}h ${minutes}m left`;
+      return `${hours}h ${minutes}m remaining`;
     } else {
-      return `${minutes}m left`;
+      return `${minutes}m remaining`;
     }
   };
 
@@ -266,266 +251,110 @@ export default function SearchPage() {
     const isExpanded = expandedRestaurant === restaurant.id;
     
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-        {/* Restaurant Header */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-6">
-          <div className="flex items-start space-x-4">
-            <img
-              src={restaurant.image}
-              alt={restaurant.name}
-              className="w-24 h-24 rounded-lg object-cover"
-            />
+          <div className="flex items-start justify-between">
             <div className="flex-1">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 hover:text-blue-600">
-                    <Link href={`/restaurant/${restaurant.id}`}>{restaurant.name}</Link>
-                  </h3>
-                  <p className="text-sm text-gray-600 mt-1">{restaurant.description}</p>
-                  <div className="flex items-center space-x-4 mt-2">
+              <div className="flex items-center gap-3 mb-2">
+                <img 
+                  src={restaurant.image} 
+                  alt={restaurant.name}
+                  className="w-16 h-16 rounded-lg object-cover"
+                />
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg text-gray-900">{restaurant.name}</h3>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
                     <div className="flex items-center">
                       <StarSolid className="w-4 h-4 text-yellow-400" />
-                      <span className="ml-1 text-sm font-medium">{restaurant.rating}</span>
-                      <span className="ml-1 text-sm text-gray-500">({restaurant.reviewCount})</span>
+                      <span className="ml-1">{restaurant.rating}</span>
                     </div>
-                    <span className="text-sm text-gray-500">•</span>
-                    <span className="text-sm text-gray-600">{restaurant.priceRange}</span>
-                    <span className="text-sm text-gray-500">•</span>
-                    <span className="text-sm text-gray-600">{restaurant.cuisine.join(', ')}</span>
+                    <span>•</span>
+                    <span>{restaurant.reviewCount} reviews</span>
+                    <span>•</span>
+                    <span>{restaurant.distance} km away</span>
                   </div>
                 </div>
-                <button className="p-2 hover:bg-gray-100 rounded-full">
-                  <HeartIcon className="w-5 h-5 text-gray-400" />
-                </button>
               </div>
               
-              {/* Restaurant Info */}
-              <div className="flex items-center space-x-6 mt-4 text-sm">
-                <div className="flex items-center text-gray-600">
-                  <TruckIcon className="w-4 h-4 mr-1" />
-                  <span>{restaurant.deliveryTime}</span>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <MapPinIcon className="w-4 h-4 mr-1" />
-                  <span>{restaurant.distance} mi</span>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <CheckCircleIcon className="w-4 h-4 mr-1" />
-                  <span>{restaurant.onTimeDelivery}% on-time</span>
-                </div>
-                <div className="text-gray-600">
-                  Min. ${restaurant.minimumOrder}
-                </div>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {restaurant.cuisine.map(cuisine => (
+                  <span key={cuisine} className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                    {cuisine}
+                  </span>
+                ))}
               </div>
-
-              {/* Tags */}
-              <div className="flex flex-wrap gap-2 mt-3">
-                {restaurant.tags.map(tag => (
-                  <span key={tag} className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full">
-                    {tag}
+              
+              <p className="text-gray-600 text-sm mb-3">{restaurant.description}</p>
+              
+              <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
+                <div className="flex items-center gap-4">
+                  <span className="flex items-center gap-1">
+                    <ClockIcon className="w-4 h-4" />
+                    {restaurant.deliveryTime}
                   </span>
-                ))}
-                {restaurant.dietaryOptions.map(option => (
-                  <span key={option} className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full">
-                    {option}
+                  <span className="flex items-center gap-1">
+                    <CurrencyDollarIcon className="w-4 h-4" />
+                    {restaurant.priceRange}
                   </span>
-                ))}
+                  <span className="flex items-center gap-1">
+                    <TruckIcon className="w-4 h-4" />
+                    {restaurant.onTimeDelivery}% on time
+                  </span>
+                </div>
               </div>
             </div>
+            
+            <div className="flex flex-col items-end gap-2">
+              <button
+                onClick={() => setExpandedRestaurant(isExpanded ? null : restaurant.id)}
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+              >
+                {isExpanded ? 'Show less' : 'View menu'}
+              </button>
+            </div>
           </div>
-
-          {/* View Menu Button */}
-          <button
-            onClick={() => setExpandedRestaurant(isExpanded ? null : restaurant.id)}
-            className="mt-4 w-full flex items-center justify-center space-x-2 text-blue-600 hover:text-blue-700 font-medium"
-          >
-            <span>{isExpanded ? 'Hide Menu' : 'View Menu'}</span>
-            {isExpanded ? (
-              <ChevronUpIcon className="w-4 h-4" />
-            ) : (
-              <ChevronDownIcon className="w-4 h-4" />
-            )}
-          </button>
-        </div>
-
-        {/* Expanded Menu */}
-        {isExpanded && (
-          <div className="border-t border-gray-200 bg-gray-50 p-6">
-            <h4 className="font-semibold text-gray-900 mb-4">Popular Items</h4>
-            <div className="grid md:grid-cols-2 gap-4">
-              {restaurant.menus.map(menu => (
-                <div key={menu.id} className="bg-white rounded-lg p-4 border border-gray-200">
-                  <div className="flex items-start space-x-3">
-                    <img
-                      src={menu.image}
+          
+          {isExpanded && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <h4 className="font-semibold text-gray-900 mb-3">Popular Items</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {restaurant.menus.slice(0, 4).map(menu => (
+                  <div key={menu.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <img 
+                      src={menu.image} 
                       alt={menu.name}
-                      className="w-16 h-16 rounded-lg object-cover"
+                      className="w-12 h-12 rounded-lg object-cover"
                     />
                     <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <h5 className="font-medium text-gray-900">{menu.name}</h5>
+                      <h5 className="font-medium text-gray-900">{menu.name}</h5>
+                      <p className="text-sm text-gray-600">Serves {menu.serves}</p>
+                      <div className="flex items-center justify-between mt-1">
+                        <span className="font-semibold text-blue-600">${menu.price}</span>
                         {menu.bidEnabled && (
-                          <div className="flex items-center space-x-1 text-orange-600">
-                            <CurrencyDollarIcon className="w-4 h-4" />
-                            <span className="text-xs font-medium">Bidding</span>
-                          </div>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">{menu.description}</p>
-                      <div className="flex items-center justify-between mt-2">
-                        <div>
-                          <span className="text-lg font-semibold text-gray-900">
-                            ${menu.price}/person
+                          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">
+                            Bidding available
                           </span>
-                          {menu.bidEnabled && menu.currentBid && (
-                            <div className="text-sm text-orange-600">
-                              Current bid: ${menu.currentBid}
-                              {menu.bidEndTime && (
-                                <span className="ml-2 text-xs">
-                                  {formatTimeRemaining(menu.bidEndTime)}
-                                </span>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                        <button className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">
-                          {menu.bidEnabled ? 'Place Bid' : 'Add to Cart'}
-                        </button>
+                        )}
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+              <Link
+                href={`/restaurant/${restaurant.id}`}
+                className="mt-4 inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
+              >
+                View Full Menu →
+              </Link>
             </div>
-            <Link
-              href={`/restaurant/${restaurant.id}`}
-              className="mt-4 inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
-            >
-              View Full Menu →
-            </Link>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     );
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Search Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4 flex-1">
-              {/* Back Button */}
-              <Link href="/" className="p-2 hover:bg-gray-100 rounded-lg">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </Link>
-
-              {/* Search Bar */}
-              <div className="flex-1 max-w-2xl">
-                <div className="relative">
-                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search restaurants or cuisines..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                  />
-                  <button
-                    onClick={handleSearch}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
-                  >
-                    <MagnifyingGlassIcon className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Location */}
-              <div className="flex items-center space-x-2 text-sm">
-                <MapPinIcon className="w-4 h-4 text-gray-500" />
-                <span className="font-medium">{location}</span>
-                <button 
-                  onClick={() => setShowLocationModal(true)}
-                  className="text-blue-600 hover:text-blue-700"
-                >
-                  Change
-                </button>
-              </div>
-
-              {/* Party Size */}
-              <div className="flex items-center space-x-2 text-sm">
-                <UsersIcon className="w-4 h-4 text-gray-500" />
-                <span className="font-medium">{partySize} people</span>
-                <button 
-                  onClick={() => setShowPartySizeModal(true)}
-                  className="text-blue-600 hover:text-blue-700"
-                >
-                  Change
-                </button>
-              </div>
-            </div>
-
-            {/* View Toggle */}
-            <div className="flex items-center space-x-2 ml-4">
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 rounded-lg ${viewMode === 'list' ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-100'}`}
-              >
-                <Bars3Icon className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => setViewMode('map')}
-                className={`p-2 rounded-lg ${viewMode === 'map' ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-100'}`}
-              >
-                <MapIcon className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-
-          {/* Delivery Date/Time Bar */}
-          <div className="flex items-center space-x-4 mt-4 pt-4 border-t border-gray-200">
-            <div className="flex items-center space-x-2">
-              <CalendarIcon className="w-5 h-5 text-gray-500" />
-              <input
-                type="date"
-                value={selectedDeliveryDate}
-                onChange={(e) => setSelectedDeliveryDate(e.target.value)}
-                className="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <ClockIcon className="w-5 h-5 text-gray-500" />
-              <select
-                value={selectedDeliveryTime}
-                onChange={(e) => setSelectedDeliveryTime(e.target.value)}
-                className="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select time</option>
-                <option value="11:00">11:00 AM</option>
-                <option value="11:30">11:30 AM</option>
-                <option value="12:00">12:00 PM</option>
-                <option value="12:30">12:30 PM</option>
-                <option value="13:00">1:00 PM</option>
-                <option value="13:30">1:30 PM</option>
-                <option value="14:00">2:00 PM</option>
-                <option value="17:00">5:00 PM</option>
-                <option value="17:30">5:30 PM</option>
-                <option value="18:00">6:00 PM</option>
-                <option value="18:30">6:30 PM</option>
-                <option value="19:00">7:00 PM</option>
-              </select>
-            </div>
-            <span className="text-sm text-gray-600">
-              Showing restaurants available for your selected time
-            </span>
-          </div>
-        </div>
-      </div>
-
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {viewMode === 'map' ? (
@@ -545,6 +374,47 @@ export default function SearchPage() {
                       Clear all ({getActiveFiltersCount()})
                     </button>
                   )}
+                </div>
+
+                {/* Delivery Date/Time Selection */}
+                <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                  <h4 className="font-medium text-gray-900 mb-3">When is your Party?</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <CalendarIcon className="w-4 h-4 text-gray-500" />
+                      <input
+                        type="date"
+                        value={selectedDeliveryDate}
+                        onChange={(e) => setSelectedDeliveryDate(e.target.value)}
+                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <ClockIcon className="w-4 h-4 text-gray-500" />
+                      <select
+                        value={selectedDeliveryTime}
+                        onChange={(e) => setSelectedDeliveryTime(e.target.value)}
+                        className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Select time</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="11:30">11:30 AM</option>
+                        <option value="12:00">12:00 PM</option>
+                        <option value="12:30">12:30 PM</option>
+                        <option value="13:00">1:00 PM</option>
+                        <option value="13:30">1:30 PM</option>
+                        <option value="14:00">2:00 PM</option>
+                        <option value="17:00">5:00 PM</option>
+                        <option value="17:30">5:30 PM</option>
+                        <option value="18:00">6:00 PM</option>
+                        <option value="18:30">6:30 PM</option>
+                        <option value="19:00">7:00 PM</option>
+                      </select>
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      Showing restaurants available for your selected time
+                    </div>
+                  </div>
                 </div>
 
                 {/* Sort By */}
@@ -598,37 +468,25 @@ export default function SearchPage() {
                     {[1, 2, 3, 4, 5].map(star => (
                       <button
                         key={star}
-                        onClick={() => handleFilterChange('rating', star === filters.rating ? 0 : star)}
-                        className={`p-1 ${star <= filters.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                        onClick={() => handleFilterChange('rating', star)}
+                        className={`p-1 rounded ${
+                          filters.rating >= star 
+                            ? 'text-yellow-400' 
+                            : 'text-gray-300 hover:text-yellow-400'
+                        }`}
                       >
                         <StarSolid className="w-5 h-5" />
                       </button>
                     ))}
-                    <span className="ml-2 text-sm text-gray-600">
-                      {filters.rating > 0 ? `${filters.rating}+` : 'Any'}
-                    </span>
                   </div>
-                </div>
-
-                {/* Distance */}
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Distance: {filters.distance} miles
-                  </label>
-                  <input
-                    type="range"
-                    min="1"
-                    max="20"
-                    value={filters.distance}
-                    onChange={(e) => handleFilterChange('distance', parseInt(e.target.value))}
-                    className="w-full"
-                  />
                 </div>
 
                 {/* Cuisine Types */}
                 <div className="mb-6">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Cuisine</h4>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Cuisine Types
+                  </label>
+                  <div className="space-y-2 max-h-32 overflow-y-auto">
                     {cuisineTypes.map(cuisine => (
                       <label key={cuisine} className="flex items-center">
                         <input
@@ -645,8 +503,10 @@ export default function SearchPage() {
 
                 {/* Dietary Options */}
                 <div className="mb-6">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Dietary Options</h4>
-                  <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Dietary Options
+                  </label>
+                  <div className="space-y-2 max-h-32 overflow-y-auto">
                     {dietaryOptions.map(option => (
                       <label key={option} className="flex items-center">
                         <input
@@ -662,8 +522,10 @@ export default function SearchPage() {
                 </div>
 
                 {/* Features */}
-                <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Features</h4>
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Features
+                  </label>
                   <div className="space-y-2">
                     {features.map(feature => (
                       <label key={feature} className="flex items-center">
@@ -678,38 +540,68 @@ export default function SearchPage() {
                     ))}
                   </div>
                 </div>
+
+                {/* Distance */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Maximum Distance: {filters.distance} km
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="20"
+                    value={filters.distance}
+                    onChange={(e) => handleFilterChange('distance', parseInt(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Results Section */}
+            {/* Results */}
             <div className="flex-1">
-              {/* Results Header */}
-              <div className="flex items-center justify-between mb-4">
+              {/* Filters Toggle */}
+              <div className="flex items-center justify-between mb-6">
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
+                >
+                  <FunnelIcon className="w-5 h-5" />
+                  <span>Filters</span>
+                </button>
                 <div className="flex items-center space-x-4">
-                  <button
-                    onClick={() => setShowFilters(!showFilters)}
-                    className="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
-                  >
-                    <AdjustmentsHorizontalIcon className="w-5 h-5" />
-                    <span>{showFilters ? 'Hide' : 'Show'} Filters</span>
-                  </button>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    {restaurants.length} restaurants available
-                  </h2>
+                  <div className="text-sm text-gray-600">
+                    {isLoading ? 'Loading...' : `${restaurants.length} restaurants found`}
+                  </div>
+                  {/* View Toggle */}
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => setViewMode('list')}
+                      className={`p-2 rounded-lg ${(viewMode as 'list' | 'map') === 'list' ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-100'}`}
+                    >
+                      <Bars3Icon className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => setViewMode('map')}
+                      className={`p-2 rounded-lg ${(viewMode as 'list' | 'map') === 'map' ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-100'}`}
+                    >
+                      <MapIcon className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              {/* Restaurant List */}
+              {/* Results */}
               {isLoading ? (
                 <div className="space-y-4">
                   {[1, 2, 3].map(i => (
                     <div key={i} className="bg-white rounded-lg shadow-sm p-6 animate-pulse">
                       <div className="flex items-start space-x-4">
-                        <div className="w-24 h-24 bg-gray-300 rounded-lg"></div>
-                        <div className="flex-1 space-y-3">
-                          <div className="h-4 bg-gray-300 rounded w-1/3"></div>
-                          <div className="h-3 bg-gray-300 rounded w-2/3"></div>
-                          <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+                        <div className="w-16 h-16 bg-gray-200 rounded-lg"></div>
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                          <div className="h-3 bg-gray-200 rounded w-1/4"></div>
                         </div>
                       </div>
                     </div>
@@ -724,34 +616,10 @@ export default function SearchPage() {
                   ))}
                 </div>
               )}
-
-              {/* Load More */}
-              {!isLoading && restaurants.length > 0 && (
-                <div className="mt-8 text-center">
-                  <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
-                    Load More Restaurants
-                  </button>
-                </div>
-              )}
             </div>
           </div>
         )}
       </div>
-
-      {/* Modals */}
-      <LocationModal
-        isOpen={showLocationModal}
-        onClose={() => setShowLocationModal(false)}
-        onSelectLocation={handleLocationSelect}
-        currentLocation={location}
-      />
-
-      <PartySizeModal
-        isOpen={showPartySizeModal}
-        onClose={() => setShowPartySizeModal(false)}
-        onSelectSize={handlePartySizeSelect}
-        currentSize={partySize}
-      />
     </div>
   );
 } 

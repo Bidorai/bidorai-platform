@@ -1,3 +1,27 @@
+/**
+ * 🚫 WHY CHOOSE - FROZEN DESIGN
+ * 
+ * IMPORTANT: This component is part of the frozen home page design.
+ * The layout and styling should not be modified without approval.
+ * 
+ * Reference: frontend/customer/backup/homepage-frozen/WhyChoose.tsx
+ * 
+ * Last Modified: December 7, 2024
+ * Version: 1.0.0 (FROZEN)
+ * 
+ * DO NOT MODIFY:
+ * - Section layout and structure
+ * - Styling classes and colors
+ * - Component positioning
+ * 
+ * Allowed modifications:
+ * - Content updates (text, images)
+ * - Bug fixes
+ * - Performance improvements
+ * 
+ * Before making any changes, consult the frozen backup version.
+ */
+
 export function WhyChoose() {
   const features = [
     {

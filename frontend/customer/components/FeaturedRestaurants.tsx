@@ -1,3 +1,27 @@
+/**
+ * 🚫 FEATURED RESTAURANTS - FROZEN DESIGN
+ * 
+ * IMPORTANT: This component is part of the frozen home page design.
+ * The layout and styling should not be modified without approval.
+ * 
+ * Reference: frontend/customer/backup/homepage-frozen/FeaturedRestaurants.tsx
+ * 
+ * Last Modified: December 7, 2024
+ * Version: 1.0.0 (FROZEN)
+ * 
+ * DO NOT MODIFY:
+ * - Section layout and structure
+ * - Styling classes and colors
+ * - Component positioning
+ * 
+ * Allowed modifications:
+ * - Content updates (restaurant data, images)
+ * - Bug fixes
+ * - Performance improvements
+ * 
+ * Before making any changes, consult the frozen backup version.
+ */
+
 export function FeaturedRestaurants() {
   const restaurants = [
     {
@@ -67,9 +91,9 @@ export function FeaturedRestaurants() {
         </div>
         
         <div className="text-center mt-12">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
+          <a href="/search" className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
             🍴 EXPLORE OUR RESTAURANT PARTNERS
-          </button>
+          </a>
         </div>
       </div>
     </section>

@@ -1,3 +1,30 @@
+/**
+ * 🚫 HERO SECTION - FROZEN DESIGN
+ * 
+ * IMPORTANT: This is the main hero section component for the customer portal.
+ * The design has been frozen and should not be modified without approval.
+ * 
+ * Reference: frontend/customer/backup/homepage-frozen/HeroSection.tsx
+ * 
+ * Last Modified: December 7, 2024
+ * Version: 1.0.0 (FROZEN)
+ * 
+ * DO NOT MODIFY:
+ * - Layout structure (two-column design)
+ * - Styling classes and colors
+ * - Component positioning
+ * - Search functionality
+ * - Location focus icon behavior
+ * 
+ * Allowed modifications:
+ * - Content updates (text, images)
+ * - Bug fixes
+ * - Performance improvements
+ * - Accessibility improvements
+ * 
+ * Before making any changes, consult the frozen backup version.
+ */
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,6 +36,7 @@ import { Modal } from './Modal';
 import { SignIn, SignUp } from '@clerk/nextjs';
 import { SearchBar } from './SearchBar';
 import { MdMyLocation } from 'react-icons/md';
+import Link from "next/link";
 
 const mockBids = [
   {
@@ -171,66 +199,6 @@ export function HeroSection() {
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-blue-50 to-orange-50 overflow-hidden">
-      {/* Header Section */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
-          {/* Left: Logo */}
-          <a href="/" className="flex items-center space-x-2">
-            <img src="/logo.png" alt="Bidovio Logo" className="w-9 h-9" />
-            <span className="font-bold text-2xl text-blue-700">Bidovio</span>
-          </a>
-          {/* Center: Search Bar */}
-          <div className="flex-1 flex justify-center">
-            <SearchBar />
-          </div>
-          {/* Right: Phone, Links, Cart, Auth */}
-          <div className="flex items-center space-x-6">
-            <div className="flex items-center space-x-1 text-red-600 font-semibold whitespace-nowrap">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-              <span>1-800-BIDORAI</span>
-            </div>
-            {authState === 'signed-out' && (
-              <a href="/restaurantowners" className="text-gray-600 hover:text-blue-700 whitespace-nowrap">For Restaurants</a>
-            )}
-            <div className="relative">
-              <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-1.5">2</span>
-              <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7A2 2 0 007.48 19h9.04a2 2 0 001.83-2.2L17 13M7 13V6h13" /></svg>
-            </div>
-            
-            {/* Auth Section */}
-            {authState === 'signed-out' ? (
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={openSignIn}
-                  className="text-gray-600 hover:text-blue-700 font-medium"
-                >
-                  Sign in
-                </button>
-                <button
-                  onClick={openSignUp}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
-                >
-                  Sign up
-                </button>
-              </div>
-            ) : authState === 'signed-in' && user ? (
-              <div className="flex items-center space-x-2">
-                <img
-                  src={user.imageUrl}
-                  alt={user.fullName || 'User'}
-                  className="w-8 h-8 rounded-full"
-                />
-                <span className="text-gray-700 font-medium">{user.firstName}</span>
-              </div>
-            ) : (
-              <div className="w-20 h-8 bg-gray-200 animate-pulse rounded"></div>
-            )}
-          </div>
-        </div>
-      </header>
-
       {/* Hero Content Section */}
       <div className="flex items-center justify-center flex-1 px-4 py-2">
         <div className="flex flex-col lg:flex-row gap-8 max-w-7xl w-full items-stretch justify-center">
@@ -333,9 +301,9 @@ export function HeroSection() {
                 </div>
               ))}
             </div>
-            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-xl text-xl transition-colors duration-200 shadow-lg mb-4">
+            <Link href="/bidding" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-xl text-xl transition-colors duration-200 shadow-lg mb-4 inline-block text-center">
               🎯 Join Live Bidding
-            </button>
+            </Link>
             <button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-8 rounded-xl text-lg transition-colors duration-200 shadow-lg">
               ▶️ Watch Demo
             </button>

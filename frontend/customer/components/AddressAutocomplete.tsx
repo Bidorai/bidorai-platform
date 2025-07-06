@@ -1,3 +1,28 @@
+/**
+ * 🚫 ADDRESS AUTOCOMPLETE - FROZEN DESIGN
+ * 
+ * IMPORTANT: This component is part of the frozen home page design.
+ * The functionality and styling should not be modified without approval.
+ * 
+ * Reference: frontend/customer/backup/homepage-frozen/AddressAutocomplete.tsx
+ * 
+ * Last Modified: December 7, 2024
+ * Version: 1.0.0 (FROZEN)
+ * 
+ * DO NOT MODIFY:
+ * - Google Maps integration
+ * - Autocomplete functionality
+ * - Styling and positioning
+ * - Location selection behavior
+ * 
+ * Allowed modifications:
+ * - Bug fixes
+ * - Performance improvements
+ * - Accessibility improvements
+ * 
+ * Before making any changes, consult the frozen backup version.
+ */
+
 'use client';
 
 import { useRef, useCallback, useState } from 'react';

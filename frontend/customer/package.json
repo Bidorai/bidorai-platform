@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "check-homepage": "node scripts/check-homepage-protection.js"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.23.1",

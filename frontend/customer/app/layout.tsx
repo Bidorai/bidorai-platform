@@ -6,6 +6,7 @@ import { GoogleMapsProvider } from '../providers/GoogleMapsProvider'
 import { ClerkProvider } from '@clerk/nextjs'
 import ConditionalHeader from '../components/ConditionalHeader'
 import { CartProvider } from '../contexts/CartContext'
+import { SearchProvider } from '../contexts/SearchContext'
 import { Cart } from '../components/Cart'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -26,15 +27,17 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.png" type="image/png" />
       </head>
       <body className={inter.className}>
-        <ClerkProvider>
+        <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!}>
           <GoogleMapsProvider>
-            <CartProvider>
-              <ConditionalHeader />
-              <div className="min-h-screen bg-gray-50">
-                {children}
-              </div>
-              <Cart />
-            </CartProvider>
+            <SearchProvider>
+              <CartProvider>
+                <ConditionalHeader />
+                <div className="min-h-screen bg-gray-50">
+                  {children}
+                </div>
+                <Cart />
+              </CartProvider>
+            </SearchProvider>
             <footer className="bg-gray-900 text-white pt-16 pb-16">
               <div className="max-w-7xl mx-auto px-6">
                 <div className="text-center mb-8">

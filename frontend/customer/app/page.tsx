@@ -1,3 +1,29 @@
+/**
+ * 🚫 HOME PAGE - FROZEN DESIGN
+ * 
+ * IMPORTANT: This is the main customer portal home page.
+ * The design has been frozen and should not be modified without approval.
+ * 
+ * Reference: frontend/customer/backup/homepage-frozen/
+ * 
+ * Last Modified: December 7, 2024
+ * Version: 1.0.0 (FROZEN)
+ * 
+ * DO NOT MODIFY:
+ * - Component structure
+ * - Styling classes
+ * - Layout arrangement
+ * - Authentication flow
+ * 
+ * Allowed modifications:
+ * - Content updates (text, images)
+ * - Bug fixes
+ * - Performance improvements
+ * - Accessibility improvements
+ * 
+ * Before making any changes, consult the frozen backup version.
+ */
+
 "use client";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -16,17 +42,8 @@ export default function HomePage() {
   const { isSignedIn } = useUser();
   const { loaded } = useClerk();
 
-  // Only redirect if user is signed in and Clerk is loaded
-  useEffect(() => {
-    if (loaded && isSignedIn) {
-      // Add a small delay to ensure the authentication state is fully processed
-      const timer = setTimeout(() => {
-        router.push('/dashboard');
-      }, 1000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isSignedIn, loaded, router]);
+  // Removed automatic redirect to dashboard - users can now stay on home page
+  // and access dashboard through the user menu if needed
 
   // Mock data for BiddingCard
   const mockSession = {
